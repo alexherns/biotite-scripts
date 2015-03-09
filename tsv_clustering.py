@@ -8,6 +8,19 @@ from scipy.cluster.hierarchy import linkage, dendrogram
 from matplotlib import pyplot as plt
 from scipy.cluster import hierarchy
 
+"""
+Example script for plotting hierarchical clusters on top of heatmap
+using various Python modules. Output to SVG. Will need to move axes
+around to better suit incoming data.
+
+Assumes row identifiers in first column.
+Assumes column identifiers in first row.
+Assumes all input data is numerical
+
+Usage: tsv_clustering.py <data.tsv> <fig.svg>
+
+"""
+
 #Use AGG backend for output to SVG
 matplotlib.use("Agg")
 

@@ -1,5 +1,8 @@
 #!/usr/bin/env python2.7
-"""
+import pysam, sys
+
+if sys.argv[-1] =="-h" or len(sys.argv)<3:
+    print """
 Simple script to pull all reads matching specified contigs from SAM file
 
 Usage: sam_reads.py <input.sam> <contigs.txt>
@@ -7,8 +10,7 @@ Output: input.sliced.sam
 
 Notes: contigs are separated by line and are formatted identically to contig definitions in SAM header
 """
-
-import pysam, sys
+    exit()
 
 samfile= pysam.AlignmentFile(sys.argv[1], "r")
 scaffoldfile= sys.argv[2]

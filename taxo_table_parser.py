@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2.7
 import sys, getopt
 
 def usage():
@@ -18,10 +18,11 @@ Usage: taxo_table_parser.py <tab_sep_taxo_table> <options>
 	--tax_def=<string>  e.g. species, genus, or class
 	--tax_query=<string>    e.g. Geobacter uraniireducens
 	--tax_cutoff=<float>    Default 0
+        --exact
 '''
         exit()
 
-opts, args = getopt.getopt(sys.argv[2:], 'h', ['help', 'min_gc=', 'max_gc=', 'min_cov=', 'max_cov=', 'min_size=', 'tax_def=', 'tax_query=', 'tax_cutoff='])
+opts, args = getopt.getopt(sys.argv[2:], 'h', ['help', 'min_gc=', 'max_gc=', 'min_cov=', 'max_cov=', 'min_size=', 'tax_def=', 'tax_query=', 'tax_cutoff=', 'exact'])
 
 min_gc = 0.
 max_gc = 100.
@@ -29,6 +30,7 @@ min_cov = 0.
 max_cov = float("inf")
 min_size = 0.
 tax_def, tax_query, tax_cutoff = [None, None, 0.]
+exact= False
 
 for o, a in opts:
 	if o in ('-h', '--help'):
@@ -51,6 +53,9 @@ for o, a in opts:
 		tax_query = a
 	elif o == '--tax_cutoff':
 		tax_cutoff = a
+        elif o == '--exact':
+                exact= True
+print exact
 
 if (tax_def is not None and tax_query is None) or (tax_query is not None and tax_def is None):
 	sys.stderr.write("ERROR: If selecting by taxonomy, you MUST provide both a taxonomic group to search and a string to identify")
@@ -100,13 +105,15 @@ for i, line in enumerate(open(sys.argv[1],'r')):
 	if len(contig_detail_list)<18:
 		sys.stderr.write("Contig {0} contains too few parameters to initialize\n".format(contig_detail_list[0]))
 		continue
-	this_contig = contig(contig_detail_list)
+        this_contig = contig(contig_detail_list)
 	if this_contig.gc >= min_gc and this_contig.gc <= max_gc \
 		and this_contig.coverage >= min_cov and this_contig.coverage <= max_cov \
 		and this_contig.size >= min_size:
 		if tax_def is not None:
-			exec("if this_contig.{0}_winner == '{1}' and this_contig.{0}_winner_pc >= {2}:\n\tprint this_contig.toString()\n\tcontig_list.append(this_contig)".format(tax_def, tax_query, tax_cutoff))
-			
+                        if exact:
+                            exec("if this_contig.{0}_winner == '{1}' and this_contig.{0}_winner_pc >= {2}:\n\tprint this_contig.toString()\n\tcontig_list.append(this_contig)".format(tax_def, tax_query, tax_cutoff))
+                        else:
+			    exec("if '{1}' in this_contig.{0}_winner and this_contig.{0}_winner_pc >= {2}:\n\tprint this_contig.toString()\n\tcontig_list.append(this_contig)".format(tax_def, tax_query, tax_cutoff))
 		else:
 			print this_contig.toString()
 			contig_list.append(this_contig)

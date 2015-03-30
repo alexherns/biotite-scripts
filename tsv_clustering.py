@@ -25,14 +25,15 @@ Usage: tsv_clustering.py -i <INPUT> -o <fig.svg> [OPTIONS]
 
 OPTIONS:
 
--d, --delimiter=      (string)    Delimiter - default "\t"
-
+-d, --delimiter=        (string)    Delimiter - default "\t"
+-l, --log-normalize     (flag)      Option to log-normalize data matrix (will remove all rows with zeros)
 """
         exit()
 
 input_file= ''
 output_file= ''
 delim= '\t'
+logNormal= False
 
 for o, a in opts:
         if o in ('-h', '--help'):
@@ -43,6 +44,8 @@ for o, a in opts:
                 output_file= a
         elif o in ('-d', '--delimiter'):
                 delim= a
+        elif o in ('-l', '--log-normalize'):
+                logNormal= True;
 
 if input_file == '' or output_file == '':
         print """
@@ -57,12 +60,12 @@ matplotlib.use("Agg")
 #Load in data from file
 df= pd.read_csv(input_file, sep=delim, header=0, index_col=0)
 
-#Remove rows with zeros, as they cannot be log-transformed
-df.replace(to_replace=0., value=np.nan, inplace=True)   #first needs to be set elements to nan
-df.dropna(axis=0, inplace=True) #drop any row with any nan values
+if logNormal == True:
+    #Remove rows with zeros, as they cannot be log-transformed
+    df.replace(to_replace=0., value=np.nan, inplace=True)   #first needs to be set elements to nan
+    df.dropna(axis=0, inplace=True) #drop any row with any nan values
+    df= np.log(df)
 
-#Log-normalized dataframe
-df= np.log(df)
 #Generate pair-wise distance matrix for each row
 row_dist= pd.DataFrame(squareform(pdist(df, metric='euclidean')), columns= df.index, index= df.index)
 

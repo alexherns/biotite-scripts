@@ -9,7 +9,7 @@ from matplotlib import pyplot as plt
 from scipy.cluster import hierarchy
 import sys, getopt
 
-opts, args = getopt.getopt(sys.argv[1:], 'i:o:d:h', ['help', 'input', 'output', 'delimiter'])
+opts, args = getopt.getopt(sys.argv[1:], 'i:o:d:hl', ['help', 'input', 'output', 'delimiter', 'log-normalize'])
 
 def usage():
         print """

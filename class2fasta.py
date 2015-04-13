@@ -5,10 +5,9 @@ opts, args = getopt.getopt(sys.argv[1:], 'c:n:d:f:h', ['help', 'class', 'names',
 
 def usage():
         print """
-Can retrieve scaffolds according to gc and coverage specifications.
-Currently only works with *fa.genes format as provided in assembly.d/sample/idba_ud_full folder
+Will create a directory to store contigs binned by ESOM mapping.
 
-Usage: pullscaffolds.py -n esom.names -c esom.class -f input.fasta -d output_directory  [OPTIONS]
+Usage: class2fasta.py -n esom.names -c esom.class -f input.fasta -d output_directory  [OPTIONS]
 
 OPTIONS:
 

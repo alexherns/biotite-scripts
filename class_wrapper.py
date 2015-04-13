@@ -7,7 +7,7 @@ def usage():
 Automatically generates ESOM class file (complete with color-coded bin assignments)
 from ESOM names file and tab-delimited scaffold-bin assignments
 
-Usage: class_wrapper <options>
+Usage: class_wrapper -n esom.names -s scaffolds2bins.tsv
 
         -h, --help      Print this help dialog
 
@@ -49,7 +49,7 @@ def get_colors(num_colors):
 
 """Dictionary of bins accessed by scaffold
     scaf_dict= {scaffold: bin}"""
-scaf_list= [line.strip().split() for line in open(scaffold_file)]
+scaf_list= [line.strip().split() for line in open(scaffold_file) if "scaffold_name" not in line]
 scaf_dict= {}
 for scaf in scaf_list:
     scaf_dict[scaf[0]]= scaf[1]

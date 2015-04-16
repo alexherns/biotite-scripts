@@ -1,0 +1,4 @@
+#!/bin/bash
+tr '\r' '\n' < $1 > tempCSVfile
+cat tempCSVfile 
+rm tempCSVfile

@@ -3,13 +3,9 @@ import pandas as pd
 import numpy as np
 import sys
 import matplotlib
-from scipy.spatial.distance import pdist, squareform
-from scipy.cluster.hierarchy import linkage, dendrogram
-from matplotlib import pyplot as plt
-from scipy.cluster import hierarchy
 import sys, getopt
 
-opts, args = getopt.getopt(sys.argv[1:], 'i:o:d:hl', ['help', 'input', 'output', 'delimiter', 'log-normalize'])
+opts, args = getopt.getopt(sys.argv[1:], 'i:o:d:b:hl', ['help', 'input', 'output', 'delimiter', 'log-normalize', 'backend'])
 
 def usage():
         print """
@@ -25,15 +21,19 @@ Usage: tsv_clustering.py -i <INPUT> -o <fig.svg> [OPTIONS]
 
 OPTIONS:
 
+-b, --backend=		(string)	Matplotlib backend to use (Default AGG)
+						Other options: AGG, PS, PDF, SVG, Cairo, GDK
 -d, --delimiter=        (string)    Delimiter - default "\t"
 -l, --log-normalize     (flag)      Option to log-normalize data matrix (will remove all rows with zeros)
 """
         exit()
 
+#Defaults
 input_file= ''
 output_file= ''
 delim= '\t'
 logNormal= False
+backend= "AGG"
 
 for o, a in opts:
         if o in ('-h', '--help'):
@@ -45,7 +45,16 @@ for o, a in opts:
         elif o in ('-d', '--delimiter'):
                 delim= a
         elif o in ('-l', '--log-normalize'):
-                logNormal= True;
+                logNormal= True
+	elif o in ('-b', '--backend'):
+		if a in ["AGG", "PS", "PDF", "SVG", "Cairo", "GDK"]:
+			backend= a
+		else:
+			print """
+Incorrect matplotlib backend selected. See -h (--help) for help
+"""
+			exit()
+
 
 if input_file == '' or output_file == '':
         print """
@@ -53,9 +62,14 @@ Please specify input and output files. See -h (--help) for help
 """
         exit()
 
-
 #Use AGG backend for output to SVG
-matplotlib.use("Agg")
+matplotlib.use(backend)
+
+#Load additional modules (needs to be after backend selection for matplotlib)
+from scipy.spatial.distance import pdist, squareform
+from scipy.cluster.hierarchy import linkage, dendrogram
+from matplotlib import pyplot as plt
+from scipy.cluster import hierarchy
 
 #Load in data from file
 df= pd.read_csv(input_file, sep=delim, header=0, index_col=0)
@@ -105,14 +119,15 @@ cax= axm.matshow(df_rowclust, interpolation= 'nearest', cmap= 'hot_r',  aspect='
 cax.set_clim(0., 10.)
 fig.colorbar(cax)
 
-axm.set_yticklabels(['']*len(list(df_rowclust.index)))
+#axm.set_yticklabels(list(df_rowclust.index), )
+#plt.yticks(np.arange(len(list(df_rowclust.columns))), list(df_rowclust.columns))
+plt.yticks(range(0,len(list(df_rowclust.index))), list(df_rowclust.index))
 plt.xticks(np.arange(len(list(df_colrowclust.columns))), list(df_colrowclust.columns), rotation="vertical")
+
+plt.tick_params(axis="y", labelsize=1)
 
 for tick in axm.xaxis.get_minor_ticks():
     tick.label1.set_verticalalignment('top')
-
-print ['']+list(df_colrowclust.columns)
-
 
 plt.savefig(output_file)
 

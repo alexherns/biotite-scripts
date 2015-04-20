@@ -1,7 +1,7 @@
 #!/usr/bin/env python2.7
 import sys, getopt, os
 
-opts, args = getopt.getopt(sys.argv[1:], 'c:n:d:f:h', ['help', 'class', 'names', 'dir', 'fasta'])
+opts, args = getopt.getopt(sys.argv[1:], 'c:n:d:f:s:h', ['help', 'class', 'names', 'dir', 'fasta', 'select'])
 
 def usage():
         print """
@@ -10,7 +10,7 @@ Will create a directory to store contigs binned by ESOM mapping.
 Usage: class2fasta.py -n esom.names -c esom.class -f input.fasta -d output_directory  [OPTIONS]
 
 OPTIONS:
-
+    -s, --select    Name of individual class to select for output
 """
         exit()
 
@@ -18,6 +18,7 @@ class_file= ''
 names_file= ''
 fasta_file= ''
 output_dir= ''
+selection= ''
 
 for o, a in opts:
     if o in ('-h', '--help'):
@@ -30,6 +31,8 @@ for o, a in opts:
         output_dir= a
     elif o in ('-f', '--fasta'):
         fasta_file= a
+    elif o in ('-s', '--select'):
+        selection= a
 
 if '' in [class_file, names_file, fasta_file, output_dir]:
         print """
@@ -58,6 +61,11 @@ for line in open(names_file):
     seqName, seqHeader= line.strip().split()[:2]
     seqHeader= "_".join(seqHeader.split("_")[:-1])
     scaffold_bins[class_assignments[seqName]].add(seqHeader)
+
+if selection != '':
+    temp_scaffold_bins= {}
+    temp_scaffold_bins[selection]= scaffold_bins[selection]
+    scaffold_bins= temp_scaffold_bins
 
 os.system("mkdir {0}".format(output_dir))
 for Bin in scaffold_bins:

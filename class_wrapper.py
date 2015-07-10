@@ -7,28 +7,34 @@ def usage():
 Automatically generates ESOM class file (complete with color-coded bin assignments)
 from ESOM names file and tab-delimited scaffold-bin assignments
 
-Usage: class_wrapper -n esom.names -s scaffolds2bins.tsv
+Usage: class_wrapper -n esom.names -s scaffolds2bins.tsv <OPTIONS>
 
         -h, --help      Print this help dialog
 
         <REQUIRED ARGUMENTS>
         -n      ESOM Names file
         -s      List of tab-delimited scaffold-bin assignments
+        
+        <OPTIONS>
+        --header	Scaffold-bin file contains header
 
 '''
         exit()
 
-opts, args = getopt.getopt(sys.argv[1:], 'hn:s:', ['help'])
+opts, args = getopt.getopt(sys.argv[1:], 'hn:s:', ['help', 'header'])
 scaffold_file= ""
 names_file= ""
+header= False
 
 for o, a in opts:
-        if o in ('-h', '--help'):
-                usage()
-        elif o == '-s':
-                scaffold_file = a
-        elif o == '-n':
-                names_file= a
+	if o in ('-h', '--help'):
+		usage()
+	elif o == '-s':
+		scaffold_file = a
+	elif o == '-n':
+		names_file= a
+	elif o == '--header':
+		header= True
 
 if len([o for o, a, in opts])<2:
         print '''
@@ -49,7 +55,10 @@ def get_colors(num_colors):
 
 """Dictionary of bins accessed by scaffold
     scaf_dict= {scaffold: bin}"""
-scaf_list= [line.strip().split() for line in open(scaffold_file) if "scaffold_name" not in line]
+file_handle= open(scaffold_file)
+if not header:
+	file_handle.readline()
+scaf_list= [line.strip().split() for line in file_handle]
 scaf_dict= {}
 for scaf in scaf_list:
     scaf_dict[scaf[0]]= scaf[1]
@@ -77,6 +86,7 @@ for org in bin_dict:
 for line in file_handle:
     i, scaf= line.strip().split()[:2]
     scaf= "_".join(scaf.split("_")[:-1])
-    print i, bin_dict[scaf_dict[scaf]]["index"]
+    if scaf in scaf_dict:
+    	print i, bin_dict[scaf_dict[scaf]]["index"]
 
 file_handle.close()

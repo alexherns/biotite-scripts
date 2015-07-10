@@ -56,4 +56,5 @@ for line in tsv_handle:
 for Bin in bin_dict:
     scaffolds= bin_dict[Bin]
     open("temp.list", "w").write("\n".join(scaffolds))
+    print "pullseq -i {0} -n temp.list > {2}{1}.fasta".format(fasta_file, Bin, output_dir)
     os.system("pullseq -i {0} -n temp.list > {2}{1}.fasta".format(fasta_file, Bin, output_dir))

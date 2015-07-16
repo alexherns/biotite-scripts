@@ -1,10 +1,11 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python
 import networkx as nx
 import matplotlib.pyplot as plt
+import networkx_viewer as nv
 
-import sys, getopt, os
+import sys, getopt, os, re
 
-opts, args = getopt.getopt(sys.argv[1:], 'c:o:h', ['help', 'connections', 'output'])
+opts, args = getopt.getopt(sys.argv[1:], 'c:o:m:h', ['help', 'connections', 'output', 'minimum'])
 
 def usage():
         print """
@@ -15,11 +16,13 @@ Usage: class2fasta.py -c sam.connections -o output.png
 OPTIONS:
     -c, --connections	Connections file
     -o, --output		Output image file
+    -m, --minimum		Minimum number of connections for scaffolds to be drawn together
 """
         exit()
 
 connections= ''
 output= ''
+min_connect= 0
 
 for o, a in opts:
     if o in ('-h', '--help'):
@@ -28,22 +31,47 @@ for o, a in opts:
         connections= a
     elif o in ('-o', '--output'):
         output= a
+    elif o in ('-m', '--minimum'):
+    	min_connect= int(a)
 
-if '' in [connections, output]:
+if '' in [connections]:
         usage()
 
 #Build the graph        
 G= nx.Graph()
-nodes= list(set([line.strip().split('\t')[0] for line in open(connections)]))
+nodes= []
+edges= {}
+for line in open(connections):
+	line= line.strip().split('\t')
+	if 'accept' not in line or 'flanking' in line:
+		continue
+	attr= {}
+	line[0]= re.search('(NODE_\d+)', line[0]).group()
+	line[2]= re.search('(NODE_\d+)', line[2]).group()
+	if line[0]==line[2]:
+		nodes.append([line[0], {'self':'True', 'direction':" ".join(line[:4]), 'count':line[4]}])
+		print line[0]+"\tSelf-edge"
+		continue
+	if line[0] not in nodes:
+		nodes.append(line[0])
+	if line[2] not in nodes:
+		nodes.append(line[2])
+	edge= sorted([line[0], line[2]])
+	lookup= "\t".join(edge)
+	if lookup in edges:
+		continue
+	if 'mid' in [line[1], line[3]]:
+		attr= {'fill':'red'}
+	attr['direction']= "  ".join(line[:4])
+	attr['count']= line[4]
+	if int(attr['count'])<min_connect:
+		continue
+	edge.append(attr)
+	edges[lookup]= edge
+
 G.add_nodes_from(nodes)
-input_lines= [line.strip().split('\t') for line in open(connections) if 'accept' in line and 'flanking' not in line]
-edges= set()
-for line in input_lines:
-	edges.add(tuple(sorted([line[0], line[2]])))
-for edge in edges:
-	print edge
-G.add_edges_from(edges)
+G.add_edges_from(edges.values())
 
 #Draw the graph
-nx.draw(G)
-plt.savefig("{0}".format(output))
+app= nv.Viewer(G)
+app.mainloop()

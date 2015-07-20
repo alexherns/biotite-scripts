@@ -49,7 +49,7 @@ for line in open(connections):
 	line[0]= re.search('(NODE_\d+)', line[0]).group()
 	line[2]= re.search('(NODE_\d+)', line[2]).group()
 	if line[0]==line[2]:
-		nodes.append([line[0], {'self':'True', 'direction':" ".join(line[:4]), 'count':line[4]}])
+		nodes.append([line[0], {'self':'True', 'fill':'blue', 'direction':" ".join(line[:4]), 'count':line[4]}])
 		print line[0]+"\tSelf-edge"
 		continue
 	if line[0] not in nodes:

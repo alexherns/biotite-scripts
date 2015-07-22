@@ -1,44 +1,27 @@
 #!/usr/bin/env python2.7
-import sys, getopt, os
+import sys, argparse, os
 
-opts, args = getopt.getopt(sys.argv[1:], 'c:n:d:f:s:h', ['help', 'class', 'names', 'dir', 'fasta', 'select'])
+parser = argparse.ArgumentParser(description='Will create a directory to store contigs binned by ESOM mapping.', formatter_class=argparse.ArgumentDefaultsHelpFormatter, add_help=False)
 
-def usage():
-        print """
-Will create a directory to store contigs binned by ESOM mapping.
+#Required arguments
+required = parser.add_argument_group('REQUIRED')
+required.add_argument('-c', help= 'esom.class', required=True, type=argparse.FileType('r'))
+required.add_argument('-n', help= 'esom.names', required=True, type=argparse.FileType('r'))
+required.add_argument('-f', help= 'input.fasta', required=True, type=argparse.FileType('r'))
+required.add_argument('-d', help= 'output directory', required=True)
 
-Usage: class2fasta.py -n esom.names -c esom.class -f input.fasta -d output_directory  [OPTIONS]
+#Optional arguments
+optional = parser.add_argument_group('OPTIONAL')
+optional.add_argument('-h', action="help", help="show this help message and exit")
+optional.add_argument('-s', help= 'Name of class for selection')
 
-OPTIONS:
-    -s, --select    Name of individual class to select for output
-"""
-        exit()
+args = parser.parse_args()
 
-class_file= ''
-names_file= ''
-fasta_file= ''
-output_dir= ''
-selection= ''
-
-for o, a in opts:
-    if o in ('-h', '--help'):
-        usage()
-    elif o in ('-n', '--names'):
-        names_file= a
-    elif o in ('-c', '--class'):
-        class_file= a
-    elif o in ('-d', '--dir'):
-        output_dir= a
-    elif o in ('-f', '--fasta'):
-        fasta_file= a
-    elif o in ('-s', '--select'):
-        selection= a
-
-if '' in [class_file, names_file, fasta_file, output_dir]:
-        print """
-Please specify appropriate parameters. See -h (--help) for help
-"""
-        exit()
+class_file= args.c
+names_file= args.n
+fasta_file= args.f
+output_dir= args.d
+selection= args.s
 
 bins= {}
 class_assignments= {}

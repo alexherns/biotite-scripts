@@ -3,51 +3,33 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import networkx_viewer as nv
 
-import sys, getopt, os, re
+import sys, argparse, os, re
 
-opts, args = getopt.getopt(sys.argv[1:], 'c:o:m:h', ['help', 'connections', 'output', 'minimum'])
+parser = argparse.ArgumentParser(description='Visualizes connections in assembly using networkx_viewer module.', formatter_class=argparse.ArgumentDefaultsHelpFormatter, add_help=False)
 
-def usage():
-        print """
-Will create a directory to store contigs binned by ESOM mapping.
+#Required arguments
+required = parser.add_argument_group('REQUIRED')
+required.add_argument('-c', help= 'connections file', required=True, type=argparse.FileType('r'))
 
-Usage: class2fasta.py -c sam.connections -o output.png
+#Optional arguments
+optional = parser.add_argument_group('OPTIONAL')
+optional.add_argument('-h', action="help", help="show this help message and exit")
+optional.add_argument('-o', metavar='<*.png>', type=argparse.FileType('w'))
+optional.add_argument('-m', metavar='<int>', type=int, default=0)
 
-OPTIONS:
-    -c, --connections	Connections file
-    -o, --output		Output image file
-    -m, --minimum		Minimum number of connections for scaffolds to be drawn together
-"""
-        exit()
-
-connections= ''
-output= ''
-min_connect= 0
-
-for o, a in opts:
-    if o in ('-h', '--help'):
-        usage()
-    elif o in ('-c', '--connections'):
-        connections= a
-    elif o in ('-o', '--output'):
-        output= a
-    elif o in ('-m', '--minimum'):
-    	min_connect= int(a)
-
-if '' in [connections]:
-        usage()
+args = parser.parse_args()
 
 #Build the graph        
 G= nx.Graph()
 nodes= []
 edges= {}
-for line in open(connections):
+for line in args.c:
 	line= line.strip().split('\t')
 	if 'accept' not in line or 'flanking' in line:
 		continue
 	attr= {}
-	line[0]= re.search('(NODE_\d+)', line[0]).group()
-	line[2]= re.search('(NODE_\d+)', line[2]).group()
+	#line[0]= re.search('(NODE_\d+)', line[0]).group()
+	#line[2]= re.search('(NODE_\d+)', line[2]).group()
 	if line[0]==line[2]:
 		nodes.append([line[0], {'self':'True', 'fill':'blue', 'direction':" ".join(line[:4]), 'count':line[4]}])
 		print line[0]+"\tSelf-edge"
@@ -64,7 +46,7 @@ for line in open(connections):
 		attr= {'fill':'red'}
 	attr['direction']= "  ".join(line[:4])
 	attr['count']= line[4]
-	if int(attr['count'])<min_connect:
+	if int(attr['count'])<args.m:
 		continue
 	edge.append(attr)
 	edges[lookup]= edge

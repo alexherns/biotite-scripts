@@ -14,3 +14,6 @@ for line in open(sys.argv[1]):
 	
 print np.mean(frac)
 print np.std(frac)
+
+hist= np.histogram(frac, 20)
+print hist

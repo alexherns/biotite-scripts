@@ -1,39 +1,23 @@
 #!/usr/bin/env python2.7
-import sys, os, getopt
+import sys, os, getopt, argparse
 
-opts, args = getopt.getopt(sys.argv[1:], 't:d:f:h', ['help', 'tsv', 'dir', 'fasta'])
+parser = argparse.ArgumentParser(description='Will create FASTA files for bins as provided from a scaffolds2bins.tsv file.', formatter_class=argparse.ArgumentDefaultsHelpFormatter, add_help=False)
 
-def usage():
-        print """
-Will create FASTA files for bins as provided from a scaffolds2bins.tsv file
+#Required arguments
+required = parser.add_argument_group('REQUIRED')
+required.add_argument('-t', help= 'scaf2bin file', type=argparse.FileType('r'), required=True)
+required.add_argument('-f', help= 'input fasta file', type=argparse.FileType('r'), required=True)
 
-Usage: -t file.tsv -f input.fasta [OPTIONS]
+#Optional arguments
+optional = parser.add_argument_group('OPTIONAL')
+optional.add_argument('-h', action="help", help="show this help message and exit")
+optional.add_argument('-d', help= 'Output directory', type=str, default= '')
 
-OPTIONS:
--d, --dir=      Output directory
+args = parser.parse_args()
 
-"""
-        exit()
-
-tsv_file= ''
-fasta_file= ''
-output_dir= ''
-
-for o, a in opts:
-    if o in ('-h', '--help'):
-        usage()
-    if o in ('-f', '--fasta='):
-        fasta_file= a
-    if o in ('-t', '--tsv='):
-        tsv_file= a
-    if o in ('-d', '--dir='):
-        output_dir= a
-
-if '' in [tsv_file, fasta_file]:
-        print """
-Please specify appropriate parameters. See -h (--help) for help
-"""
-        exit()
+tsv_file= args.t
+fasta_file= args.f
+output_dir= args.d
 
 #Format output directory properly
 if output_dir != '':

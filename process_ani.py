@@ -1,56 +1,36 @@
-#!/usr/bin/env python
-import sys, os, getopt, glob
+#!/usr/bin/env python2.7
+import sys, os, getopt, glob, argparse
 
 opts, args = getopt.getopt(sys.argv[1:], 'f:i:d:o:g:ht', ['help'])
 
-def usage():
-        print """
-Runs ANI analysis on table of organisms.
+parser = argparse.ArgumentParser(description='Will create a directory to store contigs binned by ESOM mapping from glob or directory', formatter_class=argparse.ArgumentDefaultsHelpFormatter, add_help=False)
 
-Usage: process_ani.py [OPTIONS]
+#Required arguments
+required = parser.add_argument_group('REQUIRED')
 
-OPTIONS:
-		-f <string>	Directory to FASTA files
-		-i <string>	Input table of organisms by group (required if -f is passed)
-		-g <glob> glob to list of FASTA files
-		-o <string>	Alternative base name for output directory
-		-d <string>	Delimiter (Default: \\t)
-		-t 		Flag if input table contains header row (Default: off)
-"""
-        exit()
+exclusive= parser.add_mutually_exclusive_group(required=True)
+exclusive.add_argument('-d', help= 'FASTA directory', type=str)
+exclusive.add_argument('-g', help= 'glob path to list of FASTA files', type=str)
+required.add_argument('-i', help= 'input table of organisms by group', required= True, type=argparse.FileType('r'), default= '')
 
-fasta_directory= ''
-input_table= ''
-output_directory= 'ani_output'
-delim= '\t'
-header_row= False
-glb= ''
+#Optional arguments
+optional = parser.add_argument_group('OPTIONAL')
+optional.add_argument('-h', action="help", help="show this help message and exit")
+optional.add_argument('-o', help= 'Alternative base name for output directory', default= 'ani_output', type=str)
+optional.add_argument('--delimiter', help= 'Delimiter', default= '\\t', type=str)
+optional.add_argument('--header', help= 'Flag if input table contains header row', action='store_true')
 
-for o, a in opts:
-    if o in ('-h', '--help'):
-        usage()
-    elif o in ('-f'):
-        fasta_directory= a
-    elif o in ('-i'):
-        input_table= a
-    elif o in ('-d'):
-        delim= a
-    elif o in ('-o'):
-        output_directory= a
-    elif o in ('-t'):
-        header_row= True
-    elif o in ('-g'):
-        glb= a
-        
+args = parser.parse_args()
 
-if '' in [fasta_directory, input_table] and glb == '':
-        print """
-Please specify appropriate parameters. See -h (--help) for help
-"""
-        exit()
+fasta_directory= args.d
+input_table= args.i
+output_directory= args.o
+delim= args.delimiter
+header_row= args.header
+glb= args.g        
 
 #Simple circuiting for glob path
-if glob != '':
+if glob != None:
 	output_directory= output_directory.strip("/")
 	temp_dir= "ani_temporary_storage"
 	if not os.path.exists(temp_dir):
@@ -65,7 +45,6 @@ if glob != '':
 fasta_directory= fasta_directory.strip("/")
 output_directory= output_directory.strip("/")
 
-
 fasta_files= os.listdir(fasta_directory)
 seqs= [file.split('.fasta')[0] for file in fasta_files]
 seqset= set(seqs)
@@ -73,7 +52,7 @@ seqset= set(seqs)
 orgset= set()
 data= []
 #Confirm the presence of all organisms in the folder before moving forward with analysis
-table_handle= open(input_table)
+table_handle= input_table
 if header_row:
 	table_handle.readline()
 for line in table_handle:

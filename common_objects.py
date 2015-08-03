@@ -1,6 +1,6 @@
 import numpy as np
 
-"""Creates a scaffold2bin dictionary object from the respective file"""
+"""Script: scaf2bin_dictionary -- Creates a scaffold2bin dictionary object from the respective file"""
 def scaf2bin_dictionary(file_handle, header=True, sep="\t"):
     if header==True:
         file_handle.readline()
@@ -10,11 +10,11 @@ def scaf2bin_dictionary(file_handle, header=True, sep="\t"):
         scaf2bin[scaffold]= Bin
     return scaf2bin
 
-"""Reads an esom.lrn file into a numpy array"""
+"""Script: lrn2np -- Reads an esom.lrn file into a numpy array"""
 def lrn2np(file_handle):
 	return np.asarray([[float(i) for i in line.strip().split()[1:]] for line in file_handle if "%" not in line])
 	
-"""Writes an esom.lrn file from a numpy array given an output file handle"""
+"""Script: writelrn -- Writes an esom.lrn file from a numpy array given an output file handle"""
 def writelrn(X, file_handle):
 	num_rows, num_cols= np.shape(X)
 	print num_rows

@@ -1,51 +1,35 @@
 #!/usr/bin/env python2.7
-import sys, getopt, os
+import os, argparse
 
-opts, args = getopt.getopt(sys.argv[1:], 's:c:b:h', ['help'])
+parser = argparse.ArgumentParser(description='Assists with linking 16s genes from EMIRGE to "best" bin.', formatter_class=argparse.ArgumentDefaultsHelpFormatter, add_help=False)
 
-def usage():
-        print """
-Will create table to assist in linking 16S genes to bins by scaffold.
+#Required arguments
+required = parser.add_argument_group('REQUIRED')
+required.add_argument('-s', help= 'scaf2bin file', type=argparse.FileType('r'), required=True)
+required.add_argument('-c', help= 'sorted clusters file output from UCLUST', type=argparse.FileType('r'), required=True)
+required.add_argument('-b', help= 'best bin choices in format "best_bin"\tbin\tbin', type=argparse.FileType('r'), required=True)
 
-Usage: 16S_bins.py -s scaf2bin.tsv -c clusters.sorted.uc -b bin_table.csv 
-"""
-        exit()
+#Optional arguments
+optional = parser.add_argument_group('OPTIONAL')
+optional.add_argument('-h', action="help", help="show this help message and exit")
 
-scaf2bin_file= ''
-cluster_file= ''
-bin_file= ''
-
-for o, a in opts:
-    if o in ('-h', '--help'):
-        usage()
-    elif o in ('-s'):
-        scaf2bin_file= a
-    elif o in ('-c'):
-        cluster_file= a
-    elif o in ('-b'):
-        bin_file= a
-
-if '' in [scaf2bin_file, cluster_file, bin_file]:
-        print """
-Please specify appropriate parameters. See -h (--help) for help
-"""
-        exit()
+args = parser.parse_args()
         
 from common_objects import *
 
 #Create scaffold2bin dictionary
-scaf2bin= scaf2bin_dictionary(open(scaf2bin_file), header=True, sep="\t")
+scaf2bin= scaf2bin_dictionary(args.s, header=True, sep="\t")
 
 #Create bin2bestbin dictionary
 bestBins= {}
-for line in open(bin_file):
+for line in args.b:
 	bins= [item for item in line.strip().split(",")[1:] if item != ""]
 	best_bin= bins.pop(0)
 	for Bin in bins:
 		bestBins[Bin]= best_bin
 	
 cluster_dict= {}	
-for line in open(cluster_file):
+for line in args.c:
 	i= line.strip().split('\t')[1]
 	seqID= line.strip().split()[8]
 	if "|" in seqID:

@@ -1,5 +1,5 @@
 #!/usr/bin/env python2.7
-import sys, argparse, os
+import argparse, os
 
 parser = argparse.ArgumentParser(description='Will create a directory to store contigs binned by ESOM mapping.', formatter_class=argparse.ArgumentDefaultsHelpFormatter, add_help=False)
 

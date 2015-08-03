@@ -1,16 +1,19 @@
 #!/usr/bin/env python
-'''
-Reports simple metrics from ouput of bedtools genomecov.
-Prints the average coverage of the genome, and percent of the genome covered by 
-each coverage level.
+import argparse
 
-Note: requires use of "bedtools genomecov" using the -d option
-Usage: coverage2avg.py <coverage_file>
-'''
+parser = argparse.ArgumentParser(description='Prints the average coverage of the genome, and percent of the genome covered by each coverage level.', formatter_class=argparse.ArgumentDefaultsHelpFormatter, add_help=False)
 
-import sys
+#Required arguments
+required = parser.add_argument_group('REQUIRED')
+required.add_argument('-c', help= 'coverage file from "bedtools genomecov -d"', required=True, type=argparse.FileType('r'))
 
-coverage_list = [float(line.strip().split()[2]) for line in open(sys.argv[1], 'r')]
+#Optional arguments
+optional = parser.add_argument_group('OPTIONAL')
+optional.add_argument('-h', action="help", help="show this help message and exit")
+
+args = parser.parse_args()
+
+coverage_list = [float(line.strip().split()[2]) for line in args.c]
 cov_dict = {}
 for val in coverage_list:
 	if val not in cov_dict:

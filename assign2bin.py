@@ -1,28 +1,17 @@
 #!/usr/bin/env python
-import sys, getopt
+import argparse
 
-def usage():
-	print '''
-Will take in a sam file and bin reads according to reference genome to which they best map.
-Outputs read files in FASTQ format.
-Requires SAM file to be built from reference contigs with sequence headers in format:
-	>pseudoX_N
-	ACTG...
-where X is the number of the isolate, and N is a unique string which identifies the contig
+parser = argparse.ArgumentParser(description='Will take in a sam file and bin reads according to reference genome to which they best map. NOTE: CURRENTLY BROKEN, ONLY WORKS FOR PSEUDO POP', formatter_class=argparse.ArgumentDefaultsHelpFormatter, add_help=False)
 
-Usage: assign2bin.py <sam_file>
-'''
-	exit()
+#Required arguments
+required = parser.add_argument_group('REQUIRED')
+required.add_argument('-s', help= 'mapping.sam', required=True, type=string)
 
-opts, args = getopt.getopt(sys.argv[1:], 'h', ['help'])
-if opts == []:
-	print '''
-This script requires more arguments. Please pass -h or --help for assistance
-'''
+#Optional arguments
+optional = parser.add_argument_group('OPTIONAL')
+optional.add_argument('-h', action="help", help="show this help message and exit")
 
-for o, a in opts:
-	if o in ('-h', '--help'):
-		usage()
+args = parser.parse_args()
 
 from Bio.Seq import Seq
 from Bio.Alphabet import generic_dna
@@ -30,7 +19,7 @@ from Bio import SeqIO
 from Bio.SeqRecord import SeqRecord
 
 time_ints = [time.time()]
-samfile = pysam.AlignmentFile(sys.argv[1], 'r')
+samfile = pysam.AlignmentFile(args.s, 'r')
 
 genomes = set([line.split()[1].split('pseudo')[1].split('_')[0] for line in samfile.text.strip().split('\n') if line.split()[0] == '@SQ'])
 read_by_genome = {}
@@ -56,11 +45,9 @@ print 'Processing of {1} reads finished in {0}s'.format(str(time_ints[-1]-time_i
 samfile.close()
 
 for key in read_by_genome:
-	out_file = open(sys.argv[1][:-3]+'reads_'+key+'.fastq', 'w')
-	print 'Writing files to {0}...'.format(sys.argv[1][:-3]+'reads_'+key+'.fastq')
+	out_file = open(args.c[:-3]+'reads_'+key+'.fastq', 'w')
+	print 'Writing files to {0}...'.format(args.c[:-3]+'reads_'+key+'.fastq')
 	SeqIO.write(read_by_genome[key], out_file, 'fastq')
-#	out_file = open(sys.argv[1][:-3]+'reads_'+key+'.txt', 'w')
-#	out_file.write('\n'.join(read_by_genome[key]))
 	out_file.close()
 	time_ints.append(time.time())
 	print '\t{0}s'.format(str(time_ints[-1]-time_ints[-2]))

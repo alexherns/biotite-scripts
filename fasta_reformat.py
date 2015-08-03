@@ -1,13 +1,17 @@
 #!/usr/bin/env python2.7
-import sys
+import argparse 
 from Bio import SeqIO
 
-if sys.argv[1] == "-h" or len(sys.argv) < 3:
-    print """
-Reformats lines properly for use with samtools or other picky programs.
+parser = argparse.ArgumentParser(description='Reformats lines properly for use with samtools or other picky programs.', formatter_class=argparse.ArgumentDefaultsHelpFormatter, add_help=False)
 
-Usage:  fasta_reformat.py   input.fasta output.fasta
-"""
-    exit()
+#Required arguments
+required = parser.add_argument_group('REQUIRED')
+required.add_argument('-f', help= 'input.fasta', required=True, type=str)
 
-SeqIO.convert(sys.argv[1], "fasta", sys.argv[2], "fasta")
+#Optional arguments
+optional = parser.add_argument_group('OPTIONAL')
+optional.add_argument('-h', action="help", help="show this help message and exit")
+
+args = parser.parse_args()
+
+SeqIO.convert(args.f, "fasta", args.f+"-reformatted", "fasta")

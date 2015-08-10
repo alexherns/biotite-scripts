@@ -1,24 +1,29 @@
 #!/usr/bin/env python2.7
-import sys, operator
+import sys, operator, argparse
 from Bio import SeqIO
 
-if len(sys.argv)<3 or sys.argv[1]=="-h" or sys.argv[1]=="--help":
-    print """
-Prints out the coverage values for each cluster, by sample and total.
-Also lists number of hits in each cluster.
-
-Usage: cluster_coverage.py <clusters.uc> <features.tsv> 
-
-TSV of features and as downloaded from ggkbase.
+parser = argparse.ArgumentParser(description='''Prints out the coverage values for each cluster, by sample and total.
+Also lists number of hits in each cluster.''', formatter_class=argparse.ArgumentDefaultsHelpFormatter, add_help=False,
+epilog= '''TSV of features and as downloaded from ggkbase.
 Scaffold_gene is in column 2.
 Coverage value is in column 5.
 
 Clusters file as generated from USEARCH
-"""
-    exit()
+''')
 
-cluster_file= sys.argv[1]
-tsv_file= sys.argv[2]
+#Required arguments
+required = parser.add_argument_group('REQUIRED')
+required.add_argument('-c', help= 'clusters.uc', required=True, type=str)
+required.add_argument('-t', help= 'features.tsv', required=True, type=str)
+
+#Optional arguments
+optional = parser.add_argument_group('OPTIONAL')
+optional.add_argument('-h', action="help", help="show this help message and exit")
+
+args = parser.parse_args()
+
+cluster_file= args.c
+tsv_file= args.t
 
 
 #Create a dictionary of feature:coverage values

@@ -1,29 +1,44 @@
 #!/usr/bin/env python2.7
-import getopt, sys
+import argparse, sys
 
-opts, args = getopt.getopt(sys.argv[1:], 'i:h', ['help', 'input', 'max_cov=', 'min_cov=', 'max_gc=', 'min_gc='])
+parser = argparse.ArgumentParser(description='''Can retrieve scaffolds according
+to gc and coverage specifications. Currently only works with *fa.genes format as
+provided in assembly.d/sample/idba_ud_full folder.''', 
+	formatter_class=argparse.ArgumentDefaultsHelpFormatter, add_help=False)
 
-def usage():
-        print """
-Can retrieve scaffolds according to gc and coverage specifications.
-Currently only works with *fa.genes format as provided in assembly.d/sample/idba_ud_full folder
+#Required arguments
+required = parser.add_argument_group('REQUIRED')
+required.add_argument('-i', help= 'input fasta', required=True, 
+	type=argparse.FileType('r'))
 
-Usage: pullscaffolds.py -i <INPUT>  [OPTIONS]
+#Optional arguments
+optional = parser.add_argument_group('OPTIONAL')
+optional.add_argument('-h', action="help", 
+	help="show this help message and exit")
+optional.add_argument('--max_cov', help= 'Maximum coverage of scaffold', 
+	metavar= 'X', type=float, default= float('inf'))
+optional.add_argument('--min_cov', help= 'Minimum coverage of scaffold', 
+	metavar= 'X', type=float, default= 0.)
+optional.add_argument('--max_gc', help= 'Maximum GC of scaffold', metavar= 'X',
+	type=float, default= 100.)
+optional.add_argument('--min_gc', help= 'Minimum GC of scaffold', metavar= 'X',
+	type=float, default= 0.)
 
-OPTIONS:
+args = parser.parse_args()
 
---max_cov=
---min_cov=
---max_gc=
---min_gc=
-"""
-        exit()
+input_file= args.i
+max_cov= args.max_cov
+min_cov= args.min_cov
+max_gc= args.max_gc
+min_gc= args.min_gc
 
-input_file= ''
-max_cov= float('inf')
-min_cov= 0.
-max_gc= 100.
-min_gc= 0.
+if args.min_cov < 0.:
+	parser.error("Coverage must be greater than or equal to 0")
+if args.min_gc < 0.:
+	parser.error("GC must be greater than or equal to 0")
+if args.max_gc > 100.:
+	parser.error("GC must be less than or equal to 100")
+
 
 for o, a in opts:
     if o in ('-h', '--help'):
@@ -39,13 +54,7 @@ for o, a in opts:
     elif o in ('--min_gc'):
         min_gc= float(a)
 
-if input_file == '':
-        print """
-Please specify input file. See -h (--help) for help
-"""
-        exit()
-
-for line in open(input_file):
+for line in input_file:
     if line.strip().split()[0] == "DEFINITION":
         seq_header= line.split('seqhdr="')[1].split('"')[0]
         sepped= seq_header.split()

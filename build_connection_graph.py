@@ -1,11 +1,12 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2.7
 import networkx as nx
 import matplotlib.pyplot as plt
-import networkx_viewer as nv
 
 import sys, argparse, os, re
 
-parser = argparse.ArgumentParser(description='Visualizes connections in assembly using networkx_viewer module.', formatter_class=argparse.ArgumentDefaultsHelpFormatter, add_help=False)
+parser = argparse.ArgumentParser(description='''Visualizes connections in assembly
+ using networkx_viewer module.''', 
+ formatter_class=argparse.ArgumentDefaultsHelpFormatter, add_help=False)
 
 #Required arguments
 required = parser.add_argument_group('REQUIRED')
@@ -18,6 +19,9 @@ optional.add_argument('-o', metavar='<*.png>', type=argparse.FileType('w'))
 optional.add_argument('-m', metavar='<int>', type=int, default=0)
 
 args = parser.parse_args()
+
+import networkx_viewer as nv
+
 
 #Build the graph        
 G= nx.Graph()

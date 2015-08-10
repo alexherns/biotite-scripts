@@ -1,45 +1,34 @@
 #!/usr/bin/env python2.7
-import sys, os, getopt
+import sys, os, argparse
 
-opts, args = getopt.getopt(sys.argv[1:], 'i:o:m:d:n:h', ['help'])
+parser = argparse.ArgumentParser(
+	description='''Runs Non-linear Dimensionality Reduction of lrn files using 
+		the command-line interface "tapkee"''', 
+	formatter_class=argparse.ArgumentDefaultsHelpFormatter, add_help=False)
 
-def usage():
-        print """
-Runs Non-linear Dimensionality Reduction of lrn files using the command-line interface "tapkee".
+#Required arguments
+required = parser.add_argument_group('REQUIRED')
+required.add_argument('-i', help= 'input.lrn', required=True, type=str)
+required.add_argument('-o', help= 'output.lrn', required=True, type=str)
 
-Usage: tapkee.py [OPTIONS]
+#Optional arguments
+optional = parser.add_argument_group('OPTIONAL')
+optional.add_argument('-h', action="help", help="show this help message and exit")
+optional.add_argument('-m', help= 'input.fasta', type=str,
+	choices= ['lle', 'npe', 'ltsa', 'lltsa', 'hlle', 'lpp', 'dm', 'isomap',
+		'l-isomap', 'mds', 'l-mds', 'spe', 'kpca', 'pca', 'ra', 'fa', 't-sne'],
+	default= 'pca')
+optional.add_argument('-d', help= 'delimiter', type=str, default= '\t')
+optional.add_argument('-n', help= 'output dimensions', type= int, default= 2)
+optional.add_argument('-x', help= 'additional tapkee arguments', type= str, default= '')
 
-OPTIONS:
-		-i, --input	<string>	ESOM lrn file
-		-o, --output	<string>	Output lrn file
-		-m, --method	<string>	Dimensional reduction method
-		-d, --delimiter	<string>	Delimiter (Default: \\t)
-		-n, --dimensions	<integer>	Number of dimensions to output (Default: 2)
-"""
-        exit()
+args = parser.parse_args()
 
-input_lrn= ''
-output_lrn= ''
-method= ''
-delim= '\t'
-dims= 2
-
-for o, a in opts:
-    if o in ('-h', '--help'):
-        usage()
-    elif o in ('-i', '--input'):
-    	input_lrn= a
-    elif o in ('-o', '--output'):
-    	output_lrn= a
-    elif o in ('-m', '--method'):
-    	method= a
-    elif o in ('-d', '--delimiter'):
-    	delim= a
-    elif o in ('-n', '--dimensions'):
-    	dims= int(a)
-        
-if '' in [input_lrn, output_lrn, method]:
-        usage()
+input_lrn= args.i
+output_lrn= args.o
+method= args.m
+delim= args.d
+dims= args.n
 
 #Modify input lrn file for usage with tapkee
 tmp_handle= open(input_lrn+'_tmp_file', 'w')
@@ -50,7 +39,7 @@ for line in open(input_lrn):
 tmp_handle.close()
 
 #Run tapkee on input lrn
-command= 'tapkee -i {0} -o {1} -m {2} -td {3} -d "{4}" --verbose'.format(input_lrn+'_tmp_file', output_lrn+'_tmp_file', method, dims, delim)
+command= 'tapkee -i {0} -o {1} -m {2} -td {3} -d "{4}" {5} --verbose'.format(input_lrn+'_tmp_file', output_lrn+'_tmp_file', method, dims, delim, args.x)
 print command
 os.system(command)
 

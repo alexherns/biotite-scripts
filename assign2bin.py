@@ -1,11 +1,11 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2.7
 import argparse
 
 parser = argparse.ArgumentParser(description='Will take in a sam file and bin reads according to reference genome to which they best map. NOTE: CURRENTLY BROKEN, ONLY WORKS FOR PSEUDO POP', formatter_class=argparse.ArgumentDefaultsHelpFormatter, add_help=False)
 
 #Required arguments
 required = parser.add_argument_group('REQUIRED')
-required.add_argument('-s', help= 'mapping.sam', required=True, type=string)
+required.add_argument('-s', help= 'mapping.sam', required=True, type=str)
 
 #Optional arguments
 optional = parser.add_argument_group('OPTIONAL')

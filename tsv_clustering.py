@@ -3,64 +3,38 @@ import pandas as pd
 import numpy as np
 import sys
 import matplotlib
-import sys, getopt
+import sys, argparse
 
-opts, args = getopt.getopt(sys.argv[1:], 'i:o:d:b:hl', ['help', 'input', 'output', 'delimiter', 'log-normalize', 'backend'])
-
-def usage():
-        print """
-Example script for plotting hierarchical clusters on top of heatmap
-using various Python modules. Output to SVG. Will need to move axes
-around to better suit incoming data.
-
-Assumes row identifiers in first column.
+parser = argparse.ArgumentParser(
+	description='''A less than perfect script to generate hierarchical clusters
+	using Python heatmaps and outputs to SVG''', 
+	formatter_class=argparse.ArgumentDefaultsHelpFormatter, add_help=False,
+	epilog= '''NOTE: Assumes row identifiers in first column.
 Assumes column identifiers in first row.
-Assumes all input data is numerical
+Assumes all input data is numerical''')
 
-Usage: tsv_clustering.py -i <INPUT> -o <fig.svg> [OPTIONS]
+#Required arguments
+required = parser.add_argument_group('REQUIRED')
+required.add_argument('-i', help= 'input data', required=True, type=str)
+required.add_argument('-o', help= 'output figure', required=True, type=str)
 
-OPTIONS:
+#Optional arguments
+optional = parser.add_argument_group('OPTIONAL')
+optional.add_argument('-h', action="help", help="show this help message and exit")
+optional.add_argument('-b', help= 'Matplotlib backend', default= 'AGG', 
+	type= str, choices= ['AGG', 'PS', 'PDS', 'SVG', 'Cairo', 'GDK'])
+optional.add_argument('-d', help= 'delimiter', type=str, default= '\t')
+optional.add_argument('-l', help= '''log-normalize data (and remove all non-zero
+	rows''', action= 'store_true')
 
--b, --backend=		(string)	Matplotlib backend to use (Default AGG)
-						Other options: AGG, PS, PDF, SVG, Cairo, GDK
--d, --delimiter=        (string)    Delimiter - default "\t"
--l, --log-normalize     (flag)      Option to log-normalize data matrix (will remove all rows with zeros)
-"""
-        exit()
+args = parser.parse_args()
 
 #Defaults
-input_file= ''
-output_file= ''
-delim= '\t'
-logNormal= False
-backend= "AGG"
-
-for o, a in opts:
-        if o in ('-h', '--help'):
-                usage()
-        elif o in ('-i', '--input'):
-                input_file= a
-        elif o in ('-o', '--output'):
-                output_file= a
-        elif o in ('-d', '--delimiter'):
-                delim= a
-        elif o in ('-l', '--log-normalize'):
-                logNormal= True
-	elif o in ('-b', '--backend'):
-		if a in ["AGG", "PS", "PDF", "SVG", "Cairo", "GDK"]:
-			backend= a
-		else:
-			print """
-Incorrect matplotlib backend selected. See -h (--help) for help
-"""
-			exit()
-
-
-if input_file == '' or output_file == '':
-        print """
-Please specify input and output files. See -h (--help) for help
-"""
-        exit()
+input_file= args.i
+output_file= args.o
+delim= args.d
+logNormal= args.l
+backend= args.b
 
 #Use AGG backend for output to SVG
 matplotlib.use(backend)

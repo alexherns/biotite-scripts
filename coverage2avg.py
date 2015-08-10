@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2.7
 import argparse
 
 parser = argparse.ArgumentParser(description='Prints the average coverage of the genome, and percent of the genome covered by each coverage level.', formatter_class=argparse.ArgumentDefaultsHelpFormatter, add_help=False)

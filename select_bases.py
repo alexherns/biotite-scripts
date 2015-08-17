@@ -1,5 +1,5 @@
 #!/usr/bin/env python2.7
-import pysam, argparse, sys
+import argparse, sys
 
 parser = argparse.ArgumentParser(description='Retrieves regions of fasta file as specified', formatter_class=argparse.ArgumentDefaultsHelpFormatter, add_help=False)
 
@@ -14,6 +14,7 @@ optional.add_argument('-h', '--help', action="help", help="show this help messag
 optional.add_argument('--min', help= 'minimum on scaffold (inclusive)', type=int, default=0)
 optional.add_argument('--max', help= 'maximum on scaffold (exclusive)', type=int, default=sys.maxint)
 optional.add_argument('--base', help= 'base for coordinate access', type=int, choices= [0,1], default=0)
+optional.add_argument('-o', help= 'print output to file', type= argparse.FileType('w'))
 
 args = parser.parse_args()
 
@@ -29,8 +30,12 @@ for id_read in fastafile.split('\n>'):
 			args.max= min(args.max, len(''.join(id_read.split('\n')[1:])))
 			if args.min > args.max:
 				parser.error('Minimum specified is higher than length of scaffold')
-			print '>{0}:{1}-{2}'.format(args.c, args.min, args.max)
-			print ''.join(id_read.split('\n')[1:])[int(args.min):int(args.max)]
+			if args.o == None:
+				print '>{0}:{1}-{2}'.format(args.c, args.min, args.max)
+				print ''.join(id_read.split('\n')[1:])[int(args.min):int(args.max)]
+			else:
+				args.o.write('>{0}:{1}-{2}\n'.format(args.c, args.min, args.max))
+				args.o.write(''.join(id_read.split('\n')[1:])[int(args.min):int(args.max)])
 			exit()
 
 print 'No sequences were found with the designated identifier'

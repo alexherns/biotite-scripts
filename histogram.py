@@ -35,11 +35,14 @@ for line in args.i:
 if args.min != None:
 	if args.s != None:
 		bins= numpy.arange(args.min, args.max+1, step=args.s)
-	else:
+	elif args.b != None:
 		bins= numpy.linspace(args.min, args.max, num=args.b)
 	heights, bins= numpy.histogram(data, bins)
 elif args.s != None:
 	bins= range(int(min(data)-args.s), int(max(data)+args.s), int(args.s))
+	heights, bins= numpy.histogram(data, bins)
+elif args.b != None:
+	bins= numpy.linspace(min(data), max(data), num=args.b)
 	heights, bins= numpy.histogram(data, bins)
 else:
 	heights, bins= numpy.histogram(data)

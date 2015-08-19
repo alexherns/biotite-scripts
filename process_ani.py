@@ -11,16 +11,20 @@ required = parser.add_argument_group('REQUIRED')
 exclusive= parser.add_mutually_exclusive_group(required=True)
 exclusive.add_argument('-d', help= 'FASTA directory', type=str)
 exclusive.add_argument('-g', help= 'glob path to list of FASTA files', type=str)
-required.add_argument('-i', help= 'input table of organisms by group', required= True, type=argparse.FileType('r'), default= '')
 
 #Optional arguments
 optional = parser.add_argument_group('OPTIONAL')
 optional.add_argument('-h', action="help", help="show this help message and exit")
 optional.add_argument('-o', help= 'Alternative base name for output directory', default= 'ani_output', type=str)
+optional.add_argument('-i', help= 'input table of organisms by group', type=argparse.FileType('r'))
 optional.add_argument('--delimiter', help= 'Delimiter', default= '\\t', type=str)
 optional.add_argument('--header', help= 'Flag if input table contains header row', action='store_true')
 
+
 args = parser.parse_args()
+
+if args.d != None and args.i == '':
+	parser.error('Input table must be specified if a FASTA directory is provided')
 
 fasta_directory= args.d
 input_table= args.i

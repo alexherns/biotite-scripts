@@ -1,15 +1,29 @@
-#!/usr/bin/env python
-'''
-Repairs improperly formatted GFF3 files.
-A common formatting error is to leave the 9th column of a feature line blank,
-which causes issues when trying to import the features into Tablet. This simple
-script repairs these errors by adding a "." in any blank columnes of a feature.
-'''
+#!/usr/bin/env python2.7
+import argparse, sys
 
-import sys
+parser = argparse.ArgumentParser(description='Reformats GFF3 files produced from Prodigal to include ID and Name', formatter_class=argparse.ArgumentDefaultsHelpFormatter, add_help=False)
 
-for line in open(sys.argv[1], 'r'):
-	if line[0] == '#' or len(line.strip().split('\t')) == 9:
+#Required arguments
+required = parser.add_argument_group('REQUIRED')
+required.add_argument('-i', help= 'input gff file', required=True, type=argparse.FileType('r'), default= sys.stdin)
+
+#Optional arguments
+optional = parser.add_argument_group('OPTIONAL')
+optional.add_argument('-h', action="help", help="show this help message and exit")
+
+
+args = parser.parse_args()
+id= ''
+
+for line in args.i:
+	if line[0] == '#':
 		print line.strip()
-	else:
-		print line.strip()+'\t.'
+		continue
+	line= line.strip().split('\t')
+	new_id= line[0]
+	if id != new_id:
+		id= new_id
+		i= 1
+	line[-1]= 'ID={0}_{2};NAME={0}_{2};{1}'.format(id, line[-1], str(i))
+	print '\t'.join(line)
+	i+=1

@@ -12,12 +12,13 @@ required.add_argument('-d', help= 'protein database for tree', required=True, ty
 optional = parser.add_argument_group('OPTIONAL')
 optional.add_argument('-h', action="help", help="show this help message and exit")
 
+
 args = parser.parse_args()
 
 	
 database_locs= {
 "mcrA": "/data3/borehole/genes/mcrA/mcrAdb2/gis.cleaned.fasta",
-"rubisco": "sample",
+"rubisco": "/data3/borehole/genes/rubisco/good_seqs.clean.fasta",
 "dsrA": "sample"
 }
 
@@ -29,7 +30,7 @@ database_location= database_locs[database]
 
 base_name= ".".join(args.f.split(".")[:-1])
 os.system("cat {0} {1} > {2}.wr.fasta".format(database_location, args.f, base_name))
-os.system("fix_header.py {0} > {1}.wr.clean.fasta".format(args.f, base_name))
+os.system("fix_header.py -f {1}.wr.fasta > {1}.wr.clean.fasta".format(args.f, base_name))
 os.system("mafft --thread 6 {0}.wr.clean.fasta > {0}.wr.clean.afa".format(base_name))
 
 print """

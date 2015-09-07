@@ -16,8 +16,8 @@ optional.add_argument('-c', help= 'contig/scaffold for read detection', type=str
 optional.add_argument('--min', help= 'minimum on scaffold', type=int, default=0)
 optional.add_argument('--max', help= 'maximum on scaffold', type=int, default=sys.maxint)
 optional.add_argument('--base', help= 'N-base for coordinate access', type=int, choices= [0,1], default=0)
-optional.add_argument('--connectivity', help= 'outputs reads that should span multiple scaffolds and the regions they occur', action="store_true")
-optional.add_argument('--threshold', help= 'minimum number of reads bridging scaffolds required to print', type=int, default=100)
+optional.add_argument('--connectivity', help= 'outputs reads that should span multiple scaffolds and the regions they occur', action="store_false")
+optional.add_argument('--threshold', help= 'minimum number of reads bridging scaffolds required to print', type=int, default=0)
 
 args = parser.parse_args()
 
@@ -75,7 +75,7 @@ if args.connectivity:
 				bridge_count+= 1
 			segs.append(seg), mates.append(mate)
 	
-		if bridge_count > args.threshold:
+		if bridge_count >= args.threshold:
 			print "Scaffold: {0}\tPosition: {1}\tReference base: {2}\tDepth: {3}".format(
 				bamfile.getrname(piled_column.reference_id),
 				piled_column.reference_pos,

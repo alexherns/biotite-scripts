@@ -22,3 +22,7 @@ def writelrn(X, file_handle):
 	file_handle.write('%\t{0}\n%\t{1}\n% key \t{2}\n'.format(str(num_rows), str(num_cols), '\t'.join(["D"+str(d) for d in range(num_cols)])))
 	for i, line in enumerate(X.tolist()):
 		file_handle.write('{0}\t{1}\n'.format(str(i+1), '\t'.join([str(j) for j in line])))
+
+"""Script: motif2regex -- Converts a protein motif query to a regex search"""
+def motif2regex(motif):
+	return motif.replace('X', '.').replace('x', '.').replace('(', '{').replace(')', '}')

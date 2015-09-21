@@ -13,6 +13,7 @@ optional.add_argument('-h', action="help", help="show this help message and exit
 optional.add_argument('--ggkbase', action= 'store_true', help= 'automatic fixes if file downloaded from ggkbase')
 optional.add_argument('--prodigal', action= 'store_true', help= 'automatic fixes if file generateed from prodigal')
 optional.add_argument('--uniprot', action= 'store_true', help= 'automatic fixes if file downloaded from uniprot')
+optional.add_argument('--silva', action= 'store_true', help= 'automatic fixes if file downloaded from silva')
 optional.add_argument('--seed', action= 'store_true', help= 'labels sequences as SEED')
 
 args = parser.parse_args()
@@ -54,6 +55,16 @@ elif args.uniprot:
 			if args.seed:
 				line+= '---SEED'
 		print line.strip()
+
+elif args.silva:
+	for line in args.f:
+		if ">" in line:
+			replacement_tuples= [('\t', '_'), ('[', '_'), (']', '_'), ('(', '_'), (')', '_'), ('.', '_'), (' ', '_'), (';', '|')]
+			for tuple in replacement_tuples:
+				line= line.replace(tuple[0], tuple[1])
+			if args.seed:
+				line+= '---SEED'
+		print line.strip()
 		
 else:
 	for line in args.f:
@@ -62,5 +73,7 @@ else:
 				line= line.replace(tuple[0], tuple[1])
 		elif "-" in line:
 			line.replace('*', '-')
+		if args.seed:
+				line+= '---SEED'
 		print line.strip()
 

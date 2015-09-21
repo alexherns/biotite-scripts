@@ -5,8 +5,8 @@ parser = argparse.ArgumentParser(description='Will create FASTA files for bins a
 
 #Required arguments
 required = parser.add_argument_group('REQUIRED')
-required.add_argument('-t', help= 'scaf2bin file', type=argparse.FileType('r'), required=True)
-required.add_argument('-f', help= 'input fasta file', type=argparse.FileType('r'), required=True)
+required.add_argument('-t', help= 'scaf2bin file', type=str, required=True)
+required.add_argument('-f', help= 'input fasta file', type=str, required=True)
 
 #Optional arguments
 optional = parser.add_argument_group('OPTIONAL')

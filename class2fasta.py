@@ -7,7 +7,7 @@ parser = argparse.ArgumentParser(description='Will create a directory to store c
 required = parser.add_argument_group('REQUIRED')
 required.add_argument('-c', help= 'esom.class', required=True, type=argparse.FileType('r'))
 required.add_argument('-n', help= 'esom.names', required=True, type=argparse.FileType('r'))
-required.add_argument('-f', help= 'input.fasta', required=True, type=argparse.FileType('r'))
+required.add_argument('-f', help= 'input.fasta', required=True, type=str)
 required.add_argument('-d', help= 'output directory', required=True)
 
 #Optional arguments
@@ -26,7 +26,7 @@ selection= args.s
 bins= {}
 class_assignments= {}
 scaffold_bins= {}
-for line in open(class_file):
+for line in class_file:
     if line[0] == "%" and len(line.strip().split()) > 1:
         binID, classBin= line.strip().split()[:2] 
         binID= binID[1:]
@@ -38,7 +38,7 @@ for line in open(class_file):
         if class_assignments[seqName] not in scaffold_bins:
             scaffold_bins[class_assignments[seqName]]= set()
 
-for line in open(names_file):
+for line in names_file:
     if line[0] == "%":
         continue
     seqName, seqHeader= line.strip().split()[:2]

@@ -3,7 +3,8 @@ import kyotocabinet as kc
 import sys
 import argparse, os
 
-parser = argparse.ArgumentParser(description='Will create a directory to store contigs binned by ESOM mapping.', formatter_class=argparse.ArgumentDefaultsHelpFormatter, add_help=False)
+parser = argparse.ArgumentParser(description='Simple generation of kyotocabinet hash table from tab-separated table', 
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter, add_help=False)
 
 #Required arguments
 required = parser.add_argument_group('REQUIRED')

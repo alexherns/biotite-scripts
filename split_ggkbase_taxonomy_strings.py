@@ -17,7 +17,7 @@ args = parser.parse_args()
 
 input_file= args.i
 output_file= args.o
-df= pd.read_csv(input_file, sep='\t', index_col='name', usecols=['name', 'group', 'taxonomy'])
+df= pd.read_csv(input_file, sep='\t', index_col='name')
 
 levels= ('domain', 'phylum', 'class', 'order', 'family', 'genus', 'species')
 for level in levels:
@@ -32,6 +32,6 @@ for org in df.index:
     if tax_list[0] not in domains:
         tax_list.insert(0, 'Bacteria')
     for i in range(len(tax_list)):
-        df.loc[org][levels[i]]= tax_list[i]
+        df.set_value(org,levels[i], tax_list[i])
 
 df.to_csv(output_file)

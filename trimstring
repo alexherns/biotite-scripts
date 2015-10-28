@@ -1,0 +1,8 @@
+#!/usr/bin/env python2.7
+import sys
+
+rem_chars= sys.argv[1]
+for line in sys.stdin:
+    for c in rem_chars:
+        line= line.replace(c, '')
+    sys.stdout.write(line)

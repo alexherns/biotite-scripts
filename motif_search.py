@@ -67,8 +67,10 @@ elif args.motif != None:
 else:
 	parser.error('You must supply either a regex string or prosite motif')
 
+re_search= re.compile(search)
+
 for seq_record in SeqIO.parse(args.i, "fasta"):
-	num_matches= len(re.findall(search, str(seq_record.seq)))
+	num_matches= len(re_search.findall(str(seq_record.seq)))
 	if num_matches >= args.min:
 		if args.matches:
 			print ">{0}-matches={2}\n{1}".format(seq_record.id, re.sub("(.{70})", "\\1\n", str(seq_record.seq), 0, re.DOTALL), str(num_matches))

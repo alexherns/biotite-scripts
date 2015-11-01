@@ -1,0 +1,9 @@
+#!/usr/bin/env python2.7
+import sys
+
+def gene2scaf(gene):
+    return '_'.join(gene.split('_')[:-1])
+
+for line in sys.stdin:
+    line= gene2scaf(line.strip())
+    sys.stdout.write(line+'\n')

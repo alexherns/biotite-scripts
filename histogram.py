@@ -1,5 +1,6 @@
 #!/usr/bin/env python2.7
 import fileinput, numpy, sys, argparse
+from collections import Counter
 
 parser = argparse.ArgumentParser(description='Generates histogram bins from numerical data.', 
 	formatter_class=argparse.ArgumentDefaultsHelpFormatter, add_help=False, 
@@ -15,6 +16,8 @@ required.add_argument('-i', nargs='?', type=argparse.FileType('r'), default=sys.
 #Optional arguments
 optional = parser.add_argument_group('OPTIONAL')
 optional.add_argument('-h', action="help", help="show this help message and exit")
+optional.add_argument('-o', action="store_true", help="list is non-numerical\
+data")
 optional.add_argument('-b', help= 'Number of bins', type=int, default=10)
 optional.add_argument('-s', help= 'Size of each bin', type=float)
 optional.add_argument('--min', help= 'Minimum for range of bins', type=float)
@@ -30,8 +33,29 @@ if args.s is not None and args.b != 10 > 1:
 
 data= []
 for line in args.i:
-	data.append(float(line.strip()))
-	
+    if args.o:
+        data.append(line.strip())
+    else:
+        data.append(float(line.strip()))
+
+def print_bins(heights, bins):
+    for a, b in zip(heights, bins):
+	if not args.pretty:
+            print "{0}\t{1}".format(b, a)
+	else:
+            print "{0}\t{1}\t{2}".format(b, a, 
+                    ''.join(["x" for i in 
+                        range(int(float(a)/max(100, max(heights))*100))]
+                        )
+                    )
+    print bins[-1]
+
+if args.o:
+    c= Counter(data)
+    bins, heights= zip(*c.items())
+    print_bins(heights, bins)
+    exit()
+
 if args.min != None:
 	if args.s != None:
 		bins= numpy.arange(args.min, args.max+1, step=args.s)
@@ -47,9 +71,4 @@ elif args.b != None:
 else:
 	heights, bins= numpy.histogram(data)
 
-for a, b in zip(heights, bins):
-	if not args.pretty:
-		print "{0}\t{1}".format(b, a)
-	else:
-		print "{0}\t{1}\t{2}".format(b, a, ''.join(["x" for i in range(int(float(a)/max(100, max(heights))*100))]))
-print bins[-1]
+print_bins(heights, bins)

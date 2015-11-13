@@ -23,6 +23,10 @@ optional.add_argument('-s', help= 'Size of each bin', type=float)
 optional.add_argument('--min', help= 'Minimum for range of bins', type=float)
 optional.add_argument('--max', help= 'Maximum for range of bins', type=float)
 optional.add_argument('--pretty', action= "store_true", help= 'Prints x\'s to visualize height of bins')
+optional.add_argument('--sort_numeric', action="store_true", help="Sorts a\
+        non-numerical histogram by frequency")
+optional.add_argument('--sort_alpha', action='store_true', help='Sorts a\
+        non-numerical histogram by key')
 
 args = parser.parse_args()
 
@@ -48,11 +52,15 @@ def print_bins(heights, bins):
                         range(int(float(a)/max(100, max(heights))*100))]
                         )
                     )
-    print bins[-1]
 
 if args.o:
     c= Counter(data)
-    bins, heights= zip(*c.items())
+    counted= c.items()
+    if args.sort_numeric:
+        counted.sort(key=lambda x: x[1])
+    elif args.sort_alpha:
+        counted.sort()
+    bins, heights= zip(*counted)
     print_bins(heights, bins)
     exit()
 

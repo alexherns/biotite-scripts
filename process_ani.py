@@ -3,7 +3,7 @@ import sys, os, getopt, glob, argparse
 
 opts, args = getopt.getopt(sys.argv[1:], 'f:i:d:o:g:ht', ['help'])
 
-parser = argparse.ArgumentParser(description='Will create a directory to store contigs binned by ESOM mapping from glob or directory', formatter_class=argparse.ArgumentDefaultsHelpFormatter, add_help=False)
+parser = argparse.ArgumentParser(description='Performs batch analysis of nucleotide identity of multiple contig files', formatter_class=argparse.ArgumentDefaultsHelpFormatter, add_help=False)
 
 #Required arguments
 required = parser.add_argument_group('REQUIRED')

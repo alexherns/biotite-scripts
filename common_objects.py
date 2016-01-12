@@ -1,4 +1,6 @@
 import numpy as np
+import kyotocabinet as kc
+import biotite_config
 
 """Function: scaf2bin_dictionary -- Creates a scaffold2bin dictionary object from the respective file"""
 def scaf2bin_dictionary(file_handle, header=True, sep="\t"):
@@ -39,3 +41,41 @@ def uclust2dict(file_handle):
         line= line.strip().split('\t')
         d[line[1]].append(line[8])
     return d
+
+def retrieve_scaf2bin_hash(hash_path= biotite_config.SCAF2BINPATH):
+    """Connect to kyotocabinet represenation of scaffolds-to-bins hash"""
+    db= kc.DB()
+    if not db.open(hash_path, kc.DB.OREADER):
+        return db.error()
+    return db
+
+def lookup_scaf2bin(scaffold, scaf2bin_hash=None):
+    """Retrieve bin name of scaffold. Will use kc.db object if provided, otherwise creates a new connection to the kc"""
+    if not scaf2bin_hash:
+        scaf2bin_hash= retrieve_scaf2bin_hash()
+    if isinstance(scaffold, str):
+        return db.get(scaffold)
+    elif isinstance(scaffold, list):
+        return db.getbulk(scaffold)
+
+def seq_list(file_path, file_type='fasta'):
+    """Returns a list of SeqRecord objects from file_path using Bio.SeqIO.parse"""
+    from Bio.SeqIO import parse
+    return list(parse(open(file_path, 'rU'), file_type))
+
+def scaffold_from_gene(gene):
+    """Returns the scaffold from a gene (ggkbase style!)"""
+    return '_'.join(gene.split('_')[:-1])
+
+def rename_by_bin(multifasta, scaf2bin_hash=None, header_type= 'scaffold'):
+    """Renames header in each SeqRecord object in the multifasta list according to bin"""
+    if not scaf2bin_hash:
+        scaf2bin_hash= retrieve_scaf2bin_hash()
+    for seq_record in multifasta:
+        scaffold= seq_record.id
+        if header_type == 'gene':
+            scaffold= scaffold_from_gene(scaffold)
+        genome_bin= scaf2bin_hash.get(scaffold)
+        if genome_bin:
+            seq_record.id= genome_bin
+    return multifasta

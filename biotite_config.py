@@ -4,6 +4,12 @@ import socket
 DATA3DIR= '/data3/borehole'
 
 if socket.gethostname() == 'biotite':
-    SCAF2BINPATH= '/data3/borehole/scaffolds2bins/horonobe_nr.scaf2bin.kch'
+    FULLSCAF2BINPATH= '/data3/borehole/scaffolds2bins/horonobe.'
+    NRSCAF2BINPATH= '/data3/borehole/scaffolds2bins/horonobe_nr.scaf2bin.kch'
 else:
-    SCAF2BINPATH= '/Users/alexh/Documents/berkeley/banfield_lab/scaffolds2bins/horonobe_nr.scaf2bin.kch'
+    BIN_TO_BIN_CSV='/Users/alexh/Documents/berkeley/banfield_lab/organism_info/best_choices-LF.csv'
+    PUBLICATION_NAMES='/Users/alexh/Documents/berkeley/banfield_lab/organism_info/publication_names.csv'
+    FULLSCAF2BINPATH=\
+            '/Users/alexh/Documents/berkeley/banfield_lab/scaffolds2bins/horonobe.scaffolds_to_bin.kch'
+    NRSCAF2BINPATH= \
+            '/Users/alexh/Documents/berkeley/banfield_lab/scaffolds2bins/horonobe_nr.scaf2bin.kch'

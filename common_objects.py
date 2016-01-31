@@ -2,6 +2,20 @@ import numpy as np
 import kyotocabinet as kc
 import biotite_config
 
+def mutate_sequence(seq, percent_id=0.9):
+    """Mutates the StringBuffer sequence seq, retaining input percent id with
+    the original"""
+    import random
+    from copy import deepcopy
+    aminos= list('ACDEFGHIKLMNPQRSTVWY')
+    seq= deepcopy(seq)
+    num_mutations= int((1-percent_id)*len(seq))
+    for _ in xrange(num_mutations):
+        mut_position= random.randint(0, len(seq)-1)
+        new_amino= aminos[random.randint(0, len(aminos)-1)]
+        seq[mut_position]= new_amino
+    return seq
+
 def scaf2bin_dictionary(file_handle, header=True, sep="\t"):
     """"Creates a scaffold2bin dictionary object from the respective file"""
     if header==True:

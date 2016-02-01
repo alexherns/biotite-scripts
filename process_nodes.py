@@ -48,6 +48,25 @@ def build_name_hash(dmp_file, namedb= 'names.kch'):
     finally:
         db.close()
 
+def build_reverse_name_hash(dmp_file, namedb= 'reverse_names.kch'):
+    """
+    Creates a reverse-hash interpretation of the names.dmp file from NCBI using kyotocabinet.
+    Only stores scientific names, as all others are pretty much useless except for legacy reasons.
+    """
+    db= kc.DB()
+    if not db.open(namedb, db.OWRITER | db.OCREATE):
+        sys.stderr.write("opening error: " + str(db.error()))
+    try:
+        for line in dmp_file:
+            if "scientific name" not in line:
+                continue
+            line= line.strip().split('\t|\t')
+            key= line[0]
+            name= line[1]
+            db.set(name, key)
+    finally:
+        db.close()
+
 def taxonomy(tax_id, db):
     """
     Returns the taxonomy "string" of the tax_id as a list structure back to (but not including) root
@@ -121,6 +140,7 @@ if __name__ == '__main__':
     optional.add_argument('--names', help= 'A names.kch file built using this module', type=str)
     optional.add_argument('--nodes', help= 'A nodes.kch file built using this module', type=str, required=True)
     optional.add_argument('--build_names', help= 'Build a kch for the names.dmp file', type=str)
+    optional.add_argument('--build_reverse_names', help= 'Build a reverse kch for the names.dmp file', type=str)
     optional.add_argument('--build_nodes', help= 'Build a kch for the nodes.dmp file (--build_names must be run first!)', type=str)
 
     args = parser.parse_args()
@@ -134,6 +154,9 @@ if __name__ == '__main__':
     elif args.build_nodes:
         base= os.path.splitext(args.build_nodes)[0]
         build_node_hash(open(args.build_nodes), base+'.kch')
+    elif args.build_reverse_names:
+        base= os.path.splitext(args.build_reverse_names)[0]
+        build_reverse_name_hash(open(args.build_reverse_names))#, base+'.kch')
     
     if args.tax_string or args.tax_list:
         taxdb= open_taxdb(args.nodes)

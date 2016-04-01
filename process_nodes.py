@@ -82,6 +82,15 @@ def taxonomy(tax_id, db):
             break
     return tax_list
 
+def search(tax_string, reverse_db):
+    """
+    Returns taxonomy id based on a search string
+    """
+    node= db.get(tax_string)
+    if not node:
+        return ''
+    return node
+
 def open_taxdb(kch_name, method='r'):
     """
     Returns a TaxDB with safe opening

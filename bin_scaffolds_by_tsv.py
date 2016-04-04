@@ -12,6 +12,7 @@ required.add_argument('-f', help= 'input fasta file', type=str, required=True)
 optional = parser.add_argument_group('OPTIONAL')
 optional.add_argument('-h', action="help", help="show this help message and exit")
 optional.add_argument('-d', help= 'Output directory', type=str, default= '')
+optional.add_argument('-i', help= 'Read input bins from file', type=str, default= '')
 
 args = parser.parse_args()
 
@@ -37,7 +38,16 @@ for line in tsv_handle:
         bin_dict[Bin]= []
     bin_dict[Bin].append(scaffold)
 
+if args.i != '':
+    selected_bins = set()
+    for line in open(args.i):
+        line = line.strip()
+        selected_bins.add(line)
+
 for Bin in bin_dict:
+    if args.i != '':
+        if Bin not in selected_bins:
+            continue
     scaffolds= bin_dict[Bin]
     open("temp.list", "w").write("\n".join(scaffolds))
     print "pullseq -i {0} -n temp.list > {2}{1}.fasta".format(fasta_file, Bin, output_dir)

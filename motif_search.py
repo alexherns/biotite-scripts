@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python
 import argparse, sys
 
 parser = argparse.ArgumentParser(description='Rapid scan of protein primary structure motifs', formatter_class=argparse.ArgumentDefaultsHelpFormatter, add_help=False)

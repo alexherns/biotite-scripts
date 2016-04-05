@@ -54,7 +54,10 @@ if args.string == None and args.motif == None:
 
 import re
 from Bio import SeqIO
-from common_objects import motif2regex
+
+def motif2regex(motif):
+    """Converts a protein motif query to a regex search"""
+    return motif.replace('X', '.').replace('x', '.').replace('(', '{').replace(')', '}')
 
 search= args.string
 

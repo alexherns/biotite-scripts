@@ -2,6 +2,9 @@ import os
 import socket
 
 DATA3DIR= '/data3/borehole'
+BIN_TO_BIN_CSV=''
+PUBLICATION_NAMES=''
+
 
 if socket.gethostname() == 'biotite':
     FULLSCAF2BINPATH= '/data3/borehole/scaffolds2bins/horonobe.'

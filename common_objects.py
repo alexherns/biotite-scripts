@@ -1,6 +1,22 @@
 import numpy as np
 import kyotocabinet as kc
 import biotite_config
+import collections
+
+
+def parse_fasta(file_handle):
+    FASTA= collections.namedtuple('FASTA', ['header', 'seq'])
+    header= file_handle.readline()[1:].strip()
+    seq= []
+    for line in file_handle:
+        if line[0] != '>':
+            seq.append(line.strip())
+        else:
+            yield FASTA(header, ''.join(seq))
+            header= line[1:].strip()
+            seq= []
+    yield FASTA(header, ''.join(seq))
+
 
 def mutate_sequence(seq, percent_id=0.9):
     """Mutates the StringBuffer sequence seq, retaining input percent id with

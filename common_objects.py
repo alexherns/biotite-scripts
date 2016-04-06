@@ -1,11 +1,12 @@
+import sys
 import numpy as np
 import kyotocabinet as kc
 import biotite_config
 import collections
 
+FASTA= collections.namedtuple('FASTA', ['header', 'seq'])
 
 def parse_fasta(file_handle):
-    FASTA= collections.namedtuple('FASTA', ['header', 'seq'])
     header= file_handle.readline()[1:].strip()
     seq= []
     for line in file_handle:
@@ -17,6 +18,39 @@ def parse_fasta(file_handle):
             seq= []
     yield FASTA(header, ''.join(seq))
 
+def fasta_print_format(fasta):
+    return '>{0}\n{1}'.format(fasta.header, fasta.seq)
+
+def uniquify_fasta_names(file_handle, output_handle=sys.stdout):
+    seq_counter = 0
+    d = {}
+    for fasta in parse_fasta(file_handle):
+        seq_id = base10to36(seq_counter).zfill(8)
+        d[seq_id] = fasta.header
+        fasta = FASTA(seq_id, fasta.seq)
+        output_handle.write(fasta_print_format(fasta) + '\n')
+        seq_counter += 1
+    return d
+
+def rewrite_fasta_by_list(input_handle, name_mapping, output_handle=sys.stdout):
+    for fasta, correct_name in zip(parse_fasta(input_handle), name_mapping):
+        fasta = FASTA(correct_name, fasta.seq)
+        output_handle.write(fasta_print_format(fasta) + '\n')
+
+def rewrite_fasta_by_dict(input_handle, name_mapping, output_handle=sys.stdout):
+    for fasta in parse_fasta(input_handle):
+        fasta = FASTA(name_mapping[fasta.header], fasta.seq)
+        output_handle.write(fasta_print_format(fasta) + '\n')
+
+array10to36='0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+
+def base10to36(i):
+    j = []
+    while i:
+        num = i%36
+        j.append(array10to36[num])
+        i /= 36
+    return ''.join(j[::-1])
 
 def scaf2bin_dictionary(file_handle, header=True, sep="\t"):
     """"Creates a scaffold2bin dictionary object from the respective file"""

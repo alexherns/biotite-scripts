@@ -62,9 +62,10 @@ def gen_fasttree_cmd(args, aln_file, tree_file, bootstrap = True):
     fastree_args.append(aln_file)
     return fastree_args
 
-def run_compare_bootstraps(single_tree, bootstrapped_trees):
+def run_compare_bootstraps(single_tree, bootstrapped_trees, output_file):
+    output_handle = open(output_file, 'wb')
     compare_cmd = gen_compare_cmd(single_tree, bootstrapped_trees)
-    return subprocess.Popen(compare_cmd)
+    return subprocess.Popen(compare_cmd, stdout=output_handle)
 
 def gen_compare_cmd(single_tree, bootstrapped_trees):
     cmp_prog_path = '/home/alexh/bin/MOTreeComparison/CompareToBootstrap.pl'
@@ -113,6 +114,20 @@ if __name__ == '__main__':
         sys.exit('WAG model incompatible with nt alignments')
     if args.gtr and not args.nt:
         sys.exit('GTR model incompatible with aa alignments')
+    base_name, ext = os.path.splitext(args.f)
+    simple_name = base_name + '.simple' + ext
+    pickle_name = base_name + '.pkl'
+    phylip_name = base_name + '.phy'
+    bootstrap_name = base_name + '.boot.phy'
+    tree_name = base_name + '.tree'
+    boottree_name = base_name + '.boots.tree'
+    compared_name = base_name + '.bootvals.tree'
+    run_uniquify_fasta(args.f, simple_name, pickle_name).wait()
+    run_fasta2phy(simple_name, phylip_name).wait()
+    run_seqboot(args, phylip_name, bootstrap_name).wait()
+    run_FastTree(args, simple_name, tree_name, bootstrap = False).wait()
+    run_FastTree(args, bootstrap_name, boottree_name, bootstrap = True).wait()
+    run_compare_bootstraps(tree_name, boottree_name, compared_name).wait()
 
 
 

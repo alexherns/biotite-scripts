@@ -22,8 +22,8 @@ output_dir= args.d
 
 #Format output directory properly
 if output_dir != '':
-        if output_dir[-1] != '/':
-                output_dir+= "/"
+    if not os.path.isdir(output_dir):
+        os.mkdir(output_dir)
 
 #scaffolds2bins file
 tsv_handle= open(tsv_file)
@@ -50,5 +50,6 @@ for Bin in bin_dict:
             continue
     scaffolds= bin_dict[Bin]
     open("temp.list", "w").write("\n".join(scaffolds))
-    print "pullseq -i {0} -n temp.list > {2}{1}.fasta".format(fasta_file, Bin, output_dir)
-    os.system("pullseq -i {0} -n temp.list > {2}{1}.fasta".format(fasta_file, Bin, output_dir))
+    Bin = Bin.replace('&', '_')
+    print "pullseq -i {0} -n temp.list > {1}.fasta".format(fasta_file, os.path.join(output_dir, Bin))
+    os.system("pullseq -i {0} -n temp.list > {1}.fasta".format(fasta_file, os.path.join(output_dir, Bin)))

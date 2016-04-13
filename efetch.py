@@ -34,10 +34,10 @@ def efetch(id):
 		batch= 500
 		for start in range(0, len(id), batch):
 			stop= (start+batch if start+batch <= len(id) else len(id))
-			results+= Entrez.efetch(db="nucleotide", rettype="fasta", retmode="text", id= id[start:stop]).read()
+			results+= Entrez.efetch(db=args.db, rettype=args.rettype, retmode=args.retmode, id= id[start:stop]).read()
 			sys.stderr.write("batch complete: {0} - {1}\n".format(str(start), str(stop-1)))
 	else:
-		results= Entrez.efetch(db="nucleotide", rettype="fasta", retmode="text", id= id).read()
+		results= Entrez.efetch(db=args.db, rettype=args.rettype, retmode=args.retmode, id= id).read()
 	return results
 	
 def unifetch(id):

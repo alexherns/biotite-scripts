@@ -1,9 +1,12 @@
 #!/usr/bin/env python
 
-import networkx as nx
+from networkx import Graph as Graph
+from networkx import connected_components as connected_components
 import os
+import sys
 import argparse
 import subprocess
+import multiprocessing
 
 def ani(fastas, sim_threshold, mash_file, threads = 6):
     """
@@ -14,7 +17,7 @@ def ani(fastas, sim_threshold, mash_file, threads = 6):
         mash_file <str>         -- pasted sketch file of all fastas being compared
         threads <int>           -- number threads for distance estimation
     """
-    ANI = nx.Graph()
+    ANI = Graph()
     # use Mash to estimate ANI
     for fasta in fastas:
         indiv_mash = fasta + '.msh'
@@ -22,8 +25,7 @@ def ani(fastas, sim_threshold, mash_file, threads = 6):
             cmp_file = indiv_mash
         else:
             cmp_file = fasta
-        mash_cmd = ['mash', 'dist', '-p', str(threads), cmp_file,
-                    mash_file]
+        mash_cmd = ['mash', 'dist', cmp_file, mash_file]
         process = subprocess.Popen(mash_cmd, stdout = subprocess.PIPE)
         for pair in process.communicate()[0].splitlines():
             a, b, dist, p, shared = pair.strip().split()
@@ -46,12 +48,13 @@ def make_mashes(fastas, mash_file, threads = 6, kmer = 21, force = False):
     """
     mash_processes = set()
     sketches = [fasta + '.msh' for fasta in fastas]
+    devnull = open(os.devnull, 'w')
     # Perform the sketching
     for fasta, sketch in zip(fastas, sketches):
         if os.path.isfile(sketch):
             continue
         mash_cmd = ['mash', 'sketch', '-o', fasta, '-k', str(kmer), fasta]
-        mash_processes.add(subprocess.Popen(mash_cmd))
+        mash_processes.add(subprocess.Popen(mash_cmd, stderr=devnull))
         if len(mash_processes) >= threads:
             os.wait()
             mash_processes.difference_update([mp for mp in mash_processes if mp.poll() is not None])
@@ -102,7 +105,7 @@ def print_clusters(ANI, info = None):
         fields = None
     header.append('list')
     print '\t'.join(header)
-    for cluster_num, cluster in enumerate(nx.connected_components(ANI)):
+    for cluster_num, cluster in enumerate(connected_components(ANI)):
         cluster = list(cluster)
         size = len(cluster)
         for genome in cluster:
@@ -120,31 +123,30 @@ def print_clusters(ANI, info = None):
             output_elements = map(str, output_elements)
             print '\t'.join(output_elements)
 
-def get_genome_lengths(fastas):
+def get_genome_lengths(fastas, threads=6):
     """
-    Get genome lengths of all fasta files
-    TODO: multi-thread
+    Get genome lengths of all fasta files concurrently using multiprocessing Pool
     """
+    from itertools import izip
     info = {}
-    for genome in fastas:
-        try:
-            size = quick_len(genome)
-        except RuntimeError:
-            sys.exit("Genome length retrieval failed on {0}".format(genome))
-        else:
-            info[genome] = {'size':size}
+    p = multiprocessing.Pool(threads)
+    sizes = p.map(quick_len, fastas)
+    for genome, size in izip(fastas, sizes):
+        info[genome] = {'size':size}
     return info 
 
 def quick_len(path):
     """
     Return <int> length of genome accessed at <str> path
     """
+    import time
     len_cmd = ['tot-bp', path]
     proc = subprocess.Popen(len_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = proc.communicate()
     if stderr == '':
         return int(stdout)
-    raise RuntimeError
+    else:
+        sys.exit("Genome length retrieval failed on {0}".format(path))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description = \
@@ -168,7 +170,7 @@ if __name__ == '__main__':
             '--kmer', default = 21, type = int, required = False, \
             help = 'kmer used for mash sketch generation')
     args = parser.parse_args()
-    genome_lengths = get_genome_lengths(args.f)
+    genome_lengths = get_genome_lengths(args.f, threads=args.t)
     make_mashes(args.f, args.m, threads = args.t, force = args.force, kmer = args.kmer)
     ANI = ani(args.f, args.s, args.m, threads = args.t)
     print_clusters(ANI, info = genome_lengths)

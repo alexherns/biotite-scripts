@@ -1,35 +1,6 @@
-/*import kyotocabinet as kc
-import sys
-import argparse, os
-
-parser = argparse.ArgumentParser(description='Simple generation of kyotocabinet hash table from tab-separated table', 
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter, add_help=False)
-
-#Required arguments
-required = parser.add_argument_group('REQUIRED')
-required.add_argument('-t', help= 'input tsv', required=True, type=str)
-required.add_argument('-k', help= 'output kyotocabinet', required=True, type=str)
-
-#Optional arguments
-optional = parser.add_argument_group('OPTIONAL')
-optional.add_argument('-h', action="help", help="show this help message and exit")
-
-args = parser.parse_args()
-
-db= kc.DB()
-if not db.open(args.k, db.OWRITER | db.OCREATE):
-    sys.stderr.write("opening error: " + str(db.error()))
-
-for line in open(args.t):
-    key, value= line.split('\t')[:2]
-    value= value.strip()
-    db.set(key, value)
-
-if not db.close():
-    sys.stderr.write("close error: " + str(db.error()))
-    */
 #include <kclangc.h>
 #include <string.h>
+/* when compiling, make sure to use the libkyotocabinet (e.g. /usr/lib64/libkyotocabinet.so) */
 
 int main(int argc, char* argv[])
 {
@@ -38,23 +9,10 @@ int main(int argc, char* argv[])
 	size_t len = 0;
 	int count = 0;
 	ssize_t read;
+
 	KCDB* db;
-	/*
-	if (stream == NULL)
-		exit(EXIT_FAILURE);
-
-	while ((read = getline(&line, &len, stream)) != -1) {
-		key = strsep(&line, "\t");
-		value = strsep(&line, "\t");
-		printf("Retrieved line of length %zu :\n", read);
-		printf("%s\t", key);
-		printf("%s\n", value);
-	}
-
-	int32_t t = kcdbopen(db, argv[2], KCOWRITER|KCOCREATE);
-	kcdbclose(db);
-	*/
 	db = kcdbnew();
+
 	if (!kcdbopen(db, argv[2], KCOWRITER | KCOCREATE))
 		fprintf(stderr, "open error: %s\n", kcecodename(kcdbecode(db)));
 

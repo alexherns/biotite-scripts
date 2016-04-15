@@ -47,7 +47,7 @@ def unifetch(id):
 		sys.stderr.write('Uniprot accessions will be queried individually!\n')
 		for i, protein in enumerate(id):
 			sys.stderr.write('Processing ({1}/{2})\t{0}...\r'.format(protein, i, len(id)))
-			response= urllib2.urlopen('http://www.uniprot.org/uniprot/{0}.fasta'.format(protein))
+			response= urllib2.urlopen('http://www.uniprot.org/uniprot/?query={0}&format=fasta'.format(protein))
 			results+= response.read()
 	else:
 		query= '+OR+'.join(['id:'+protein for protein in id])

@@ -18,6 +18,10 @@ def parse_fasta(file_handle):
             seq= []
     yield FASTA(header, ''.join(seq))
 
+def write_fastas(file_handle, fastas):
+    for fasta in fastas:
+        file_handle.write(fasta_print_format(fasta) + '\n')
+
 def fasta_print_format(fasta):
     return '>{0}\n{1}'.format(fasta.header, fasta.seq)
 

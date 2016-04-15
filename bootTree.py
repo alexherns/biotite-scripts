@@ -147,7 +147,7 @@ def run_compare_bootstraps(single_tree, bootstrapped_trees, output_file):
         bootstrapped_trees <str>    -- path to bootstrapped trees file (Newick)
         output_file <str>           -- path to write tree annotated with bootstrap support
     """ 
-    if not check_perl_module('MMOTree'):
+    if not check_perl_module('MOTree'):
         raise OSError, "Check to make sure your PERL5LIB path includes the MOTree.pm module"
     output_handle = open(output_file, 'wb')
     compare_cmd = gen_compare_cmd(single_tree, bootstrapped_trees)

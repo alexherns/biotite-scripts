@@ -18,7 +18,7 @@ optional.add_argument('--seed', action= 'store_true', help= 'labels sequences as
 
 args = parser.parse_args()
 
-replacement_tuples= [('\t', '_'), ('[', '_'), (']', '_'), ('(', '_'), (')', '_'), ('.', '_'), (' ', '_'), (';', '_')]
+replacement_tuples= [('\t', '_'), ('[', '_'), (']', '_'), ('(', '_'), (')', '_'), ('.', '_'), (' ', '_'), (';', '_'), (',', '')]
 
 if args.ggkbase:
 	for line in args.f:

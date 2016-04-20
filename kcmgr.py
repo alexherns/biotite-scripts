@@ -1,30 +1,10 @@
 #!/usr/bin/env python
-import kyotocabinet as kc
 import sys
 import argparse
 import os
 import glob
 
-kchashmgr_help = \
-'''
-usage:
-  kchashmgr create [-otr] [-onl|-otl|-onr] [-apow num] [-fpow num] [-ts] [-tl] [-tc] [-bnum num] path
-  kchashmgr inform [-onl|-otl|-onr] [-st] path
-  kchashmgr set [-onl|-otl|-onr] [-add|-rep|-app|-inci|-incd] [-sx] path key value
-  kchashmgr remove [-onl|-otl|-onr] [-sx] path key
-  kchashmgr get [-onl|-otl|-onr] [-rm] [-sx] [-px] [-pz] path key
-  kchashmgr list [-onl|-otl|-onr] [-max num] [-rm] [-sx] [-pv] [-px] path [key]
-  kchashmgr clear [-onl|-otl|-onr] path
-  kchashmgr import [-onl|-otl|-onr] [-sx] path [file]
-  kchashmgr copy [-onl|-otl|-onr] path file
-  kchashmgr dump [-onl|-otl|-onr] path [file]
-  kchashmgr load [-otr] [-onl|-otl|-onr] path [file]
-  kchashmgr defrag [-onl|-otl|-onr] path
-  kchashmgr setbulk [-onl|-otl|-onr] [-sx] path key value ...
-  kchashmgr removebulk [-onl|-otl|-onr] [-sx] path key ...
-  kchashmgr getbulk [-onl|-otl|-onr] [-sx] [-px] path key ...
-  kchashmgr check [-onl|-otl|-onr] path
-'''
+import kyotocabinet as kc
 
 KC_UTILITIES = [
     'create',
@@ -35,6 +15,12 @@ KC_UTILITIES = [
 ]
 
 def open_multi(db_names, mode = kc.DB.OREADER):
+    """
+    Return kc.DB objects for all files in db_names
+    Input:
+        db_names <iter> -- iterable of file names to open as kc.DB objects
+        mode <kc.DB.OTYPE>  -- opening mode for databases
+    """
     dbs = []
     for db_name in db_names:
         db= kc.DB()
@@ -44,13 +30,26 @@ def open_multi(db_names, mode = kc.DB.OREADER):
     return dbs
 
 def close_multi(dbs):
+    """
+    Safely close all kc.DB objects in dbs
+    Input:
+        dbs <iterm[kc.DB]>   -- iterable of kc.DB objects to close
+    """
     for db in dbs:
         if not db.close():
             sys.stderr.write('close error: ' + str(db.error()))
 
 def distribute(dbs, fread, batch_size = 1000, delim = '\t'):
+    """
+    Distribute key-value pairs from fread into dbs
+    Input:
+        dbs <iterm[kc.DB]>  -- iterable of kc.DB objects
+        fread <IO>          -- IO handle for reading
+        batch_size <int>    -- number of items to write per batch
+        delim <str>         -- delimiter to split key-value
+    """
     num_dbs = len(dbs)
-    line_batch = [{} for _ in xrange(num_dbs)]
+    line_batch = [{} for _ in xrange(num_dbs)] #An array of dictionaries to store batches prior to writing
     lines_read = 0
     for line in fread:
         lines_read += 1
@@ -65,12 +64,19 @@ def distribute(dbs, fread, batch_size = 1000, delim = '\t'):
             line_batch[db_num] = {}
         if lines_read % 100000 == 0:
             sys.stderr.write('Processed: {0}\n'.format(lines_read))
+    #Finish writing any stragglers
     for db_num in xrange(num_dbs):
         this_map = line_batch[db_num]
         if len(this_map) > 0:
             dbs[db_num].set_bulk(this_map)
 
 def iter_batch(dbs, fread):
+    """
+    Iterator to retrieve pairs requested by fread from dbs
+    Input:
+        dbs <iterm[kc.DB]>  -- iterable of kc.DB objects
+        fread <IO>          -- IO handle for reading keys (one per line)
+    """
     num_dbs = len(dbs)
     for line in fread:
         query = line.strip()

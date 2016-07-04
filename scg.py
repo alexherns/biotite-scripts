@@ -17,6 +17,7 @@ args = parser.parse_args()
 hmm_dict= {
 'DNGNGWU00014': 'rpL14',
 'DNGNGWU00021': 'rpL15',
+'DNGNGWU00018': 'rpL16',
 'DNGNGWU00033': 'rpL18',
 'DNGNGWU00007': 'rpL22',
 'DNGNGWU00040': 'rpL24',

@@ -49,3 +49,7 @@ ribosomal protein S7
 ribosomal protein S8
 ribosomal protein S9
 Valyl tRNA synthetase
+<<<<<<< HEAD
+=======
+
+>>>>>>> 5c11d0978af432d3d00c4da69768ae01a13d61a7

@@ -36,3 +36,7 @@ Translation initiation factor 5A
 Translation initiation factor IF-2 subunit gamma
 tRNA N6-adenosine threonylcarbamoyltransferase
 Valyl-tRNA synthetase
+<<<<<<< HEAD
+=======
+
+>>>>>>> 5c11d0978af432d3d00c4da69768ae01a13d61a7

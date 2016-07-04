@@ -1,0 +1,39 @@
+CCA-adding enzyme
+Dimethyladenosine transferase
+Diphthamide biosynthesis protein
+DNA-directed RNA polymerase
+DNA-directed RNA polymerase subunit N
+Fibrillarin-like rRNA/tRNA 2'-O-methyltransferase
+Glycyl-tRNA synthetase
+KH type 1 domain protein
+Methionyl-tRNA synthetase
+Non-canonical purine NTP pyrophosphatase
+Phenylalanyl-tRNA synthetase alpha subunit
+Phenylalanyl-tRNA synthetase beta subunit
+Pre-mRNA processing ribonucleoprotein
+Prolyl-tRNA synthetase
+Protein pelota homolog
+PUA domain containing protein
+Ribosomal protein L10e
+Ribosomal protein L13
+Ribosomal protein L18e
+Ribosomal protein L21e
+Ribosomal protein L3
+Ribosomal protein L7Ae/L8e
+Ribosomal protein S13
+Ribosomal protein S15
+Ribosomal protein S19e
+Ribosomal protein S2
+Ribosomal protein S28e
+Ribosomal protein S3Ae
+Ribosomal protein S6e
+Ribosomal protein S7
+Ribosomal protein S9
+Ribosome maturation protein SDO1 homolog
+Signal recognition particle 54 kDa protein
+Transcription elongation factor Spt5
+Translation initiation factor 5A
+Translation initiation factor IF-2 subunit gamma
+tRNA N6-adenosine threonylcarbamoyltransferase
+Valyl-tRNA synthetase
+
